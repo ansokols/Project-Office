@@ -323,6 +323,30 @@ AnimatorController:
     m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
+    m_Name: Pistol
+    m_StateMachine: {fileID: -2548570565257099693}
+    m_Mask: {fileID: 0}
+    m_Motions:
+    - serializedVersion: 2
+      m_State: {fileID: 849260741703678566}
+      m_Motion: {fileID: 7400000, guid: 117c2804a27c2334f97edab7ea6f5015, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 8083831947740347711}
+      m_Motion: {fileID: 7400000, guid: d2e4cb33a6c5afd458c0957c6075dee5, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 0}
+      m_Motion: {fileID: 7400000, guid: 1be51b13f52bd244ea669f75e4c70d66, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 0}
+      m_Motion: {fileID: 7400000, guid: bf4b87bf585f34e499ed113fae5100a8, type: 2}
+    m_Behaviours: []
+    m_BlendingMode: 0
+    m_SyncedLayerIndex: -1
+    m_DefaultWeight: 0
+    m_IKPass: 0
+    m_SyncedLayerAffectsTiming: 0
+    m_Controller: {fileID: 9100000}
+  - serializedVersion: 5
     m_Name: Flashlight
     m_StateMachine: {fileID: -1829527269581504386}
     m_Mask: {fileID: 0}
@@ -353,31 +377,7 @@ AnimatorController:
       m_Motion: {fileID: 7400000, guid: f4aef6e8b7555c54f9a959c46c0a894f, type: 2}
     m_Behaviours: []
     m_BlendingMode: 0
-    m_SyncedLayerIndex: 0
-    m_DefaultWeight: 0
-    m_IKPass: 0
-    m_SyncedLayerAffectsTiming: 0
-    m_Controller: {fileID: 9100000}
-  - serializedVersion: 5
-    m_Name: Pistol
-    m_StateMachine: {fileID: -2548570565257099693}
-    m_Mask: {fileID: 0}
-    m_Motions:
-    - serializedVersion: 2
-      m_State: {fileID: 849260741703678566}
-      m_Motion: {fileID: 7400000, guid: 117c2804a27c2334f97edab7ea6f5015, type: 2}
-    - serializedVersion: 2
-      m_State: {fileID: 8083831947740347711}
-      m_Motion: {fileID: 7400000, guid: d2e4cb33a6c5afd458c0957c6075dee5, type: 2}
-    - serializedVersion: 2
-      m_State: {fileID: 0}
-      m_Motion: {fileID: 7400000, guid: 1be51b13f52bd244ea669f75e4c70d66, type: 2}
-    - serializedVersion: 2
-      m_State: {fileID: 0}
-      m_Motion: {fileID: 7400000, guid: bf4b87bf585f34e499ed113fae5100a8, type: 2}
-    m_Behaviours: []
-    m_BlendingMode: 0
-    m_SyncedLayerIndex: -1
+    m_SyncedLayerIndex: 1
     m_DefaultWeight: 0
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2208109052942463598}
   - component: {fileID: 3521893452123719775}
   - component: {fileID: 6799616033650319156}
-  - component: {fileID: 3769373982227355870}
   m_Layer: 0
   m_Name: Grey brick wall (Thick)
   m_TagString: Untagged
@@ -27,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3816556353728149000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.473548, y: -9.994307, z: 0}
+  m_LocalPosition: {x: -8.473548, y: -9.994307, z: 10}
   m_LocalScale: {x: 0.50045174, y: 0.4672, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -103,7 +102,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8.056471, y: 2.1399999}
+    oldSize: {x: 8, y: 2.14}
     newSize: {x: 7.9847856, y: 2.14}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
@@ -112,33 +111,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 8, y: 2.14}
   m_EdgeRadius: 0
---- !u!114 &3769373982227355870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3816556353728149000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShadowGroup: 0
-  m_ComponentVersion: 1
-  m_HasRenderer: 1
-  m_UseRendererSilhouette: 1
-  m_CastsShadows: 1
-  m_SelfShadows: 0
-  m_ApplyToSortingLayers: 00000000
-  m_ShapePath:
-  - {x: -4, y: -1.0699997, z: 0}
-  - {x: -4, y: 1.0699997, z: 0}
-  - {x: 4, y: 1.0699997, z: 0}
-  - {x: 4, y: -1.0699997, z: 0}
-  m_ShapePathHash: 0
-  m_Mesh: {fileID: 0}
-  m_InstanceId: -172486
-  m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 4, y: 1.0699997, z: 0}

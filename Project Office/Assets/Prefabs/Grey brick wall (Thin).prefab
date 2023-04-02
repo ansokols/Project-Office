@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8582066113881976109}
   - component: {fileID: 568784571235117034}
   - component: {fileID: 4651788054916567383}
-  - component: {fileID: 8955297611198720535}
   m_Layer: 0
   m_Name: Grey brick wall (Thin)
   m_TagString: Untagged
@@ -27,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6222427429551707526}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.1964, y: -33.89, z: 0}
+  m_LocalPosition: {x: 0.1964, y: -33.89, z: 10}
   m_LocalScale: {x: 0.6546, y: 0.4004, z: 0.4285714}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -112,33 +111,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.11, y: 1.02}
   m_EdgeRadius: 0
---- !u!114 &8955297611198720535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6222427429551707526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShadowGroup: 0
-  m_ComponentVersion: 1
-  m_HasRenderer: 1
-  m_UseRendererSilhouette: 1
-  m_CastsShadows: 1
-  m_SelfShadows: 0
-  m_ApplyToSortingLayers: 00000000
-  m_ShapePath:
-  - {x: -19.775736, y: -0.51000214, z: 0}
-  - {x: -19.775736, y: 0.51000214, z: 0}
-  - {x: 19.775738, y: 0.51000214, z: 0}
-  - {x: 19.775738, y: -0.51000214, z: 0}
-  m_ShapePathHash: 0
-  m_Mesh: {fileID: 0}
-  m_InstanceId: -156692
-  m_LocalBounds:
-    m_Center: {x: 0.0000019073486, y: 0, z: 0}
-    m_Extent: {x: 19.775738, y: 0.51000214, z: 0}
