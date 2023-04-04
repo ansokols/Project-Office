@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 2785892986896789964}
   - component: {fileID: 2785892986896789963}
   - component: {fileID: 2785892986896789966}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Vending machine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,7 @@ MonoBehaviour:
   - {x: 1.4, y: -1.68, z: 0}
   m_ShapePathHash: 622749225
   m_Mesh: {fileID: 0}
-  m_InstanceId: 93110
+  m_InstanceId: 101166
   m_LocalBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 1.4, y: 1.68, z: 0}

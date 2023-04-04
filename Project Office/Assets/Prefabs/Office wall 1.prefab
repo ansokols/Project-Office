@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 715934694470893525}
   - component: {fileID: 715934694470893531}
   - component: {fileID: 715934694470893524}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: White pixel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ MonoBehaviour:
   - {x: 1.3733597, y: 2.4362144, z: 0.000000044703484}
   m_ShapePathHash: 62577813
   m_Mesh: {fileID: 0}
-  m_InstanceId: 46920
+  m_InstanceId: 161814
   m_LocalBounds:
     m_Center: {x: -1.3314018, y: 2.6885881, z: 0}
     m_Extent: {x: 3.5809212, y: 2.080142, z: 0}
@@ -192,7 +192,7 @@ GameObject:
   - component: {fileID: 715934694890636436}
   - component: {fileID: 715934694890636442}
   - component: {fileID: 715934694890636443}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: White pixel (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

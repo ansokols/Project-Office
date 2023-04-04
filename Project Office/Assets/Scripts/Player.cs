@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     private Vector2 moveVelocity;
     private Vector2 mousePos;
     private Vector2 lookDir;
+    private float lookAngle;
     
     private Rigidbody2D rb;
     private Animator anim;
@@ -69,7 +70,7 @@ public class Player : MonoBehaviour
         rb.MovePosition(rb.position + moveVelocity * Time.fixedDeltaTime);
 
         lookDir = mousePos - rb.position;
-        float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+        lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
         rb.rotation = lookAngle;
     }
 }

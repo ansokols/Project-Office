@@ -26,27 +26,5 @@ public class Body : MonoBehaviour
         {
             anim.SetBool("isRunning", true);
         }
-
-        if (Input.GetKey("1"))
-        {
-            anim.SetLayerWeight(anim.GetLayerIndex("Flashlight"), 1);
-            anim.SetLayerWeight(anim.GetLayerIndex("Knife"), 0);
-            anim.SetLayerWeight(anim.GetLayerIndex("Pistol"), 0);
-        }
-        else if (Input.GetKey("2"))
-        {
-            anim.SetLayerWeight(anim.GetLayerIndex("Flashlight"), 0);
-            anim.SetLayerWeight(anim.GetLayerIndex("Knife"), 1);
-            anim.SetLayerWeight(anim.GetLayerIndex("Pistol"), 0);
-        }
-        else if (Input.GetKey("3"))
-        {
-            anim.SetLayerWeight(anim.GetLayerIndex("Flashlight"), 0);
-            anim.SetLayerWeight(anim.GetLayerIndex("Knife"), 0);
-            anim.SetLayerWeight(anim.GetLayerIndex("Pistol"), 1);
-        }
-
-        anim.SetBool("isShooting", Input.GetButton("Fire1"));
-        anim.SetBool("isReloading", Input.GetKey(KeyCode.R));
     }
 }

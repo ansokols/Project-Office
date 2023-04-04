@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2208109052942463598}
   - component: {fileID: 3521893452123719775}
   - component: {fileID: 6799616033650319156}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grey brick wall (Thick)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

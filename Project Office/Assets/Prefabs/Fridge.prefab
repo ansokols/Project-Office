@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3876969210720557387}
   - component: {fileID: 6137073033484553474}
   - component: {fileID: 5978639259938117102}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fridge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ MonoBehaviour:
   - {x: 5.3, y: -5.5, z: 0}
   m_ShapePathHash: 527456037
   m_Mesh: {fileID: 0}
-  m_InstanceId: 79970
+  m_InstanceId: 101110
   m_LocalBounds:
     m_Center: {x: 0, y: -0.099999905, z: 0}
     m_Extent: {x: 5.3, y: 5.4, z: 0}
@@ -282,7 +282,7 @@ MonoBehaviour:
   - {x: 5.3, y: -5.5, z: 0}
   m_ShapePathHash: 527456037
   m_Mesh: {fileID: 0}
-  m_InstanceId: 79980
+  m_InstanceId: 101120
   m_LocalBounds:
     m_Center: {x: 0, y: -0.099999905, z: 0}
     m_Extent: {x: 5.3, y: 5.4, z: 0}
@@ -424,7 +424,7 @@ MonoBehaviour:
   - {x: 5.3, y: -5.5, z: 0}
   m_ShapePathHash: 527456037
   m_Mesh: {fileID: 0}
-  m_InstanceId: 79976
+  m_InstanceId: 101116
   m_LocalBounds:
     m_Center: {x: 0, y: -0.099999905, z: 0}
     m_Extent: {x: 5.3, y: 5.4, z: 0}
