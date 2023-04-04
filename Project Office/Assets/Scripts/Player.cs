@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public float speed;
     public float runningSpeed;
+    public int maxHealth;
+    public int health;          //public for test, should be private
+    public Image healthDisplay;
 
     private Vector2 moveInput;
     private Vector2 moveVelocity;
@@ -22,6 +26,7 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        healthDisplay.fillAmount = (float)health / (float)maxHealth;
     }
 
     // Update is called once per frame

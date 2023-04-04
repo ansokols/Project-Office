@@ -14,7 +14,7 @@ public class PistolBullet : MonoBehaviour
         {
             GameObject effect = Instantiate(enemyHitEffect, transform.position, Quaternion.identity);
             collision.collider.transform.parent.GetComponent<Enemy>().TakeDamage(damage);
-            Destroy(effect, 60f);
+            Destroy(effect, 120f);
             Destroy(gameObject);
         }
         else
