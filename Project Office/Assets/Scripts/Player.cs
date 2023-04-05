@@ -5,11 +5,26 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    [Header("Objects")]
+    public Camera cam;
+    public Image healthDisplay;
+    public Text healDisplay;
+
+    [Header("Characteristics")]
     public float speed;
     public float runningSpeed;
     public int maxHealth;
-    public int health;          //public for test, should be private
-    public Image healthDisplay;
+    public int health;
+    public int healCapacity;
+    public int healAmount;
+    public int healImpact;
+    public float healTime;
+
+    [Header("Audio")]
+    public AudioSource playerAudioSource;
+    public AudioSource interactionAudioSource;
+    public AudioClip healPickupSFX;
+    public AudioClip healingSFX;
 
     private Vector2 moveInput;
     private Vector2 moveVelocity;
@@ -19,19 +34,30 @@ public class Player : MonoBehaviour
     
     private Rigidbody2D rb;
     private Animator anim;
-    public Camera cam;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        healDisplay.text = healAmount.ToString();
         healthDisplay.fillAmount = (float)health / (float)maxHealth;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (GetComponent<Shooting>().cooldown <= 0)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    if (healAmount > 0 && health != maxHealth)
+                    {
+                        StartCoroutine(Heal());
+                    }
+                }
+        }
+
         moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         float deltaAngle = Vector2.SignedAngle(moveInput, lookDir);
@@ -77,5 +103,36 @@ public class Player : MonoBehaviour
         lookDir = mousePos - rb.position;
         lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
         rb.rotation = lookAngle;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Heal") && healAmount < healCapacity)
+        {
+            interactionAudioSource.PlayOneShot(healPickupSFX, 0.125f);
+            healAmount += 1;
+            healDisplay.text = healAmount.ToString();
+            Destroy(other.gameObject);
+        }
+    }
+
+    private IEnumerator Heal()
+    {
+        playerAudioSource.PlayOneShot(healingSFX, 0.25f);
+
+        Shooting shooting = GetComponent<Shooting>();
+        shooting.cooldown = healTime;
+        yield return new WaitForSeconds(healTime);
+
+        if (health < maxHealth - healImpact)
+        {
+            health = health + healImpact;
+        } else {
+            health = maxHealth;
+        }
+        healAmount -= 1;
+
+        healDisplay.text = healAmount.ToString();
+        healthDisplay.fillAmount = (float)health / (float)maxHealth;
     }
 }

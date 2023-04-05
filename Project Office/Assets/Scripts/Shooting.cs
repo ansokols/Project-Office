@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class Shooting : MonoBehaviour
 {
     private Animator anim;
-    [Header("Data")]
+
+    [Header("Objects")]
     public Transform firePoint;
     public GameObject bulletPrefab;
     public GameObject shellPrefab;
@@ -19,18 +20,20 @@ public class Shooting : MonoBehaviour
     public float shellForce;
     public float reloadTime;
     public float cooldownTime;
+    [HideInInspector]
+    public float cooldown;
     public int magSize;
     public int ammoAmount;
-
-    private float cooldown;
     private int magOccupancy;
 
     [Header("Audio")]
-    public AudioSource audioSource;
+    public AudioSource playerAudioSource;
+    public AudioSource interactionAudioSource;
     public AudioClip shotSFX;
     public AudioClip drySFX;
     public AudioClip reloadSFX;
     public AudioClip shellsSFX;
+    public AudioClip ammoPickupSFX;
 
     // Start is called before the first frame update
     void Start()
@@ -54,7 +57,7 @@ public class Shooting : MonoBehaviour
                     }
                     else
                     {
-                        audioSource.PlayOneShot(drySFX);
+                        playerAudioSource.PlayOneShot(drySFX, 0.4f);
                     }
                 }
 
@@ -62,7 +65,7 @@ public class Shooting : MonoBehaviour
                 {
                     if (magOccupancy != magSize && ammoAmount != 0)
                     {
-                        Reload();
+                        StartCoroutine(Reload());
                     }
                 }
         }
@@ -72,10 +75,21 @@ public class Shooting : MonoBehaviour
         }
     }
 
-    void Shoot()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        audioSource.PlayOneShot(shotSFX);
-        StartCoroutine(playSoundWithDelay(shellsSFX, 0.25f));
+        if (other.CompareTag("Ammo"))
+        {
+            interactionAudioSource.PlayOneShot(ammoPickupSFX, 0.075f);
+            ammoAmount += 9;
+            ammoDisplay.text = ammoAmount.ToString();
+            Destroy(other.gameObject);
+        }
+    }
+
+    private void Shoot()
+    {
+        playerAudioSource.PlayOneShot(shotSFX, 0.3f);
+        StartCoroutine(playSoundWithDelay(shellsSFX, 0.5f, 0.25f));
         anim.Play("Pistol.Shoot", 0, 0f);
 
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
@@ -95,14 +109,18 @@ public class Shooting : MonoBehaviour
         magDisplay.fillAmount -= 1.0f / (float)magSize;
     }
 
-    void Reload()
+    private IEnumerator Reload()
     {
-        audioSource.PlayOneShot(reloadSFX);
+        playerAudioSource.PlayOneShot(reloadSFX, 0.5f);
         anim.Play("Pistol.Reload", 0, 0f);
+
+        cooldown = reloadTime;
+        yield return new WaitForSeconds(reloadTime);
 
         ammoAmount += magOccupancy;
         magOccupancy = 0;
-        if (ammoAmount > magSize) {
+        if (ammoAmount > magSize)
+        {
             magOccupancy = magSize;
             ammoAmount -= magSize;
         } else {
@@ -110,14 +128,13 @@ public class Shooting : MonoBehaviour
             ammoAmount = 0;
         }
 
-        cooldown = reloadTime;
         ammoDisplay.text = ammoAmount.ToString();
         magDisplay.fillAmount = (float)magOccupancy / (float)magSize;
     }
 
-    IEnumerator playSoundWithDelay(AudioClip clip, float delay)
+    private IEnumerator playSoundWithDelay(AudioClip clip, float volume, float delay)
     {
         yield return new WaitForSeconds(delay);
-        audioSource.PlayOneShot(clip);
+        playerAudioSource.PlayOneShot(clip, volume);
     }
 }
