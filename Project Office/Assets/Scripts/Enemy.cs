@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour
     [Header("Characteristics")]
     public int health;
     public float speed;
+    [Range(0, 1)]
     public float healDropChance;
 
     // Update is called once per frame

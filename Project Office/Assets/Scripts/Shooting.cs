@@ -80,7 +80,7 @@ public class Shooting : MonoBehaviour
         if (other.CompareTag("Ammo"))
         {
             interactionAudioSource.PlayOneShot(ammoPickupSFX, 0.075f);
-            ammoAmount += 9;
+            ammoAmount += Random.Range(8, 12);
             ammoDisplay.text = ammoAmount.ToString();
             Destroy(other.gameObject);
         }
@@ -89,7 +89,7 @@ public class Shooting : MonoBehaviour
     private void Shoot()
     {
         playerAudioSource.PlayOneShot(shotSFX, 0.3f);
-        StartCoroutine(playSoundWithDelay(shellsSFX, 0.5f, 0.25f));
+        StartCoroutine(PlaySoundWithDelay(shellsSFX, 0.5f, 0.25f));
         anim.Play("Pistol.Shoot", 0, 0f);
 
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
@@ -102,7 +102,7 @@ public class Shooting : MonoBehaviour
         Destroy(shell, 20f);
 
         GameObject effect = Instantiate(flashEffect, firePoint.position, firePoint.rotation);
-        Destroy(effect, 0.1f);
+        Destroy(effect, 0.05f);
 
         cooldown = cooldownTime;
         magOccupancy -= 1;
@@ -132,7 +132,7 @@ public class Shooting : MonoBehaviour
         magDisplay.fillAmount = (float)magOccupancy / (float)magSize;
     }
 
-    private IEnumerator playSoundWithDelay(AudioClip clip, float volume, float delay)
+    private IEnumerator PlaySoundWithDelay(AudioClip clip, float volume, float delay)
     {
         yield return new WaitForSeconds(delay);
         playerAudioSource.PlayOneShot(clip, volume);

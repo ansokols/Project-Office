@@ -23,18 +23,20 @@ public class Player : MonoBehaviour
     [Header("Audio")]
     public AudioSource playerAudioSource;
     public AudioSource interactionAudioSource;
+    public AudioSource movementAudioSource;
     public AudioClip healPickupSFX;
     public AudioClip healingSFX;
+    public AudioClip walkingSFX;
+    public AudioClip runningSFX;
 
-    private Vector2 moveInput;
-    private Vector2 moveVelocity;
-    private Vector2 mousePos;
-    private Vector2 lookDir;
-    private float lookAngle;
-    
     private Rigidbody2D rb;
     private Animator anim;
-
+    private Vector2 moveInput;
+    private Vector2 moveVelocity;
+    private Vector2 lookDir;
+    private float deltaAngle;
+    private int walkingMode;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -47,20 +49,54 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        lookDir = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition) - rb.position;
+        deltaAngle = Vector2.SignedAngle(moveInput, lookDir);
+
         if (GetComponent<Shooting>().cooldown <= 0)
         {
             if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    if (healAmount > 0 && health != maxHealth)
+                    if (healAmount > 0 && health < maxHealth)
                     {
                         StartCoroutine(Heal());
                     }
                 }
         }
 
-        moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        if (moveInput.x == 0 && moveInput.y == 0)
+        {
+            anim.SetInteger("walkingMode", 0);
+            moveVelocity = moveInput.normalized * speed;
+            movementAudioSource.Stop();
+            walkingMode = 0;
+        }
+        else if (Input.GetKey(KeyCode.LeftShift))
+        {
+            anim.SetInteger("walkingMode", 2);
+            moveVelocity = moveInput.normalized * runningSpeed;
+            if (walkingMode != 2)
+            {
+                movementAudioSource.Stop();
+                walkingMode = 2;
+                movementAudioSource.clip = runningSFX;
+                movementAudioSource.volume = 0.25f;
+                movementAudioSource.Play();
+            }
+        }
+        else
+        {
+            anim.SetInteger("walkingMode", 1);
+            moveVelocity = moveInput.normalized * speed;
+            if (walkingMode != 1)
+            {
+                walkingMode = 1;
+                movementAudioSource.clip = walkingSFX;
+                movementAudioSource.volume = 0.125f;
+                movementAudioSource.Play();
+            }
+        }
 
-        float deltaAngle = Vector2.SignedAngle(moveInput, lookDir);
         if (deltaAngle >= 60 && deltaAngle <= 120)
         {
             anim.SetLayerWeight(anim.GetLayerIndex("Left"), 0);
@@ -76,33 +112,12 @@ public class Player : MonoBehaviour
             anim.SetLayerWeight(anim.GetLayerIndex("Left"), 0);
             anim.SetLayerWeight(anim.GetLayerIndex("Right"), 0);
         }
-
-        if (moveInput.x == 0 && moveInput.y == 0)
-        {
-            anim.SetInteger("walkingMode", 0);
-            moveVelocity = moveInput.normalized * speed;
-        }
-        else if (Input.GetKey(KeyCode.LeftShift))
-        {
-            anim.SetInteger("walkingMode", 2);
-            moveVelocity = moveInput.normalized * runningSpeed;
-        }
-        else
-        {
-            anim.SetInteger("walkingMode", 1);
-            moveVelocity = moveInput.normalized * speed;
-        }
-
-        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
     }
 
     void FixedUpdate()
     {
-        rb.MovePosition(rb.position + moveVelocity * Time.fixedDeltaTime);
-
-        lookDir = mousePos - rb.position;
-        lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        rb.rotation = lookAngle;
+        rb.velocity = new Vector2(moveVelocity.x, moveVelocity.y);
+        rb.rotation = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

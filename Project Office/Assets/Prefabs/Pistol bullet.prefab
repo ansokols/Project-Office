@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallHitEffect: {fileID: 4386339645698638713, guid: 54b24879efdc6bd4a9625a954b688bf5, type: 3}
   enemyHitEffect: {fileID: 7299405212545195225, guid: 77d34369c03fb71409f0578cdb345bb3, type: 3}
+  enemyHitSprite: {fileID: 5796183419789772175, guid: 4edd895ffc154634fa445448efadf841, type: 3}
   damage: 18
 --- !u!114 &5921304964217369608
 MonoBehaviour:
@@ -367,7 +368,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.922264, y: 2.4199998}
+    oldSize: {x: 2.8999999, y: 2.4468749}
     newSize: {x: 2.9, y: 2.42}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
