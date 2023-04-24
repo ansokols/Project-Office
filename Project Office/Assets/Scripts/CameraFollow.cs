@@ -23,8 +23,11 @@ public class CameraFollow : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 newPos = target.position + positionOffset;
-        transform.position = Vector3.Slerp(transform.position, newPos, followSpeed * Time.deltaTime);
+        if (target != null)
+        {
+            Vector3 newPos = target.position + positionOffset;
+            transform.position = Vector3.Slerp(transform.position, newPos, followSpeed * Time.deltaTime);
+        }
     }
 
     private void zoom(float increment)

@@ -102,6 +102,30 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -131,8 +155,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c24b060569ad5224aa7d45e6b9b2829f
-      internalID: -376819213
+      spriteID: 2bedfef8421594e4a934613a28b9bf90
+      internalID: 907957982
       vertices: []
       indices: 
       edges: []
@@ -152,8 +176,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0201ceec065d06241867616022d769b9
-      internalID: 1580908271
+      spriteID: 21f031b351c6f9747bd040c219a5cd02
+      internalID: 896679269
       vertices: []
       indices: 
       edges: []
@@ -173,8 +197,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3caceb1515796a4194c819836ab6713
-      internalID: -1642587199
+      spriteID: bbb8c0a74c7f576458f64a31ea467010
+      internalID: -1820578788
       vertices: []
       indices: 
       edges: []
@@ -194,8 +218,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a4e0e509944b2c24aa3c1775ca9f57ff
-      internalID: 1166065869
+      spriteID: c176d176d91a9e945be3d3b67824f4fd
+      internalID: -207249169
       vertices: []
       indices: 
       edges: []
@@ -215,8 +239,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 660f301459089f643b976d3d8c716b0c
-      internalID: 30612500
+      spriteID: 36efcb4e3e01f7e4d99a6f12e2b1c9ea
+      internalID: -718052261
       vertices: []
       indices: 
       edges: []
@@ -236,8 +260,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c3a5f11f69729c44abf51cfec18d8bfc
-      internalID: -440398252
+      spriteID: 708fd06b4fa6a73438d581a5794c015d
+      internalID: -626550409
       vertices: []
       indices: 
       edges: []
@@ -257,8 +281,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a9113a097b626e84fac610198069b9f8
-      internalID: 184048830
+      spriteID: 8034d15acb323ab4f96900a692375cca
+      internalID: 920580150
       vertices: []
       indices: 
       edges: []
@@ -278,8 +302,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2a1a1897ddddd0f41996dbd6ca1b0d88
-      internalID: 1471683598
+      spriteID: ab4bce1efef71c14a9e114bb3ea5bd43
+      internalID: 847218404
       vertices: []
       indices: 
       edges: []
@@ -299,8 +323,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 11e1a46a2110ff145b629ca156ce05d9
-      internalID: -801829669
+      spriteID: e8a8ec28b032da7479343b06ac7e19de
+      internalID: 303668860
       vertices: []
       indices: 
       edges: []
@@ -316,15 +340,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Blood spatter 1_0: -376819213
-      Blood spatter 1_1: 1580908271
-      Blood spatter 1_2: -1642587199
-      Blood spatter 1_3: 1166065869
-      Blood spatter 1_4: 30612500
-      Blood spatter 1_5: -440398252
-      Blood spatter 1_6: 184048830
-      Blood spatter 1_7: 1471683598
-      Blood spatter 1_8: -801829669
+      Blood spatter 1_0: 907957982
+      Blood spatter 1_1: 896679269
+      Blood spatter 1_2: -1820578788
+      Blood spatter 1_3: -207249169
+      Blood spatter 1_4: -718052261
+      Blood spatter 1_5: -626550409
+      Blood spatter 1_6: 920580150
+      Blood spatter 1_7: 847218404
+      Blood spatter 1_8: 303668860
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

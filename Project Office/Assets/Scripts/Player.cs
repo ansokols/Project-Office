@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     public Camera cam;
     public Image healthDisplay;
     public Text healDisplay;
+    public Image restartButton;
+    public Text restartText;
+    public GameObject hud;
 
     [Header("Characteristics")]
     public float speed;
@@ -44,6 +47,8 @@ public class Player : MonoBehaviour
         anim = GetComponent<Animator>();
         healDisplay.text = healAmount.ToString();
         healthDisplay.fillAmount = (float)health / (float)maxHealth;
+        restartButton.enabled = false;
+        restartText.enabled = false;
     }
 
     // Update is called once per frame
@@ -112,6 +117,14 @@ public class Player : MonoBehaviour
             anim.SetLayerWeight(anim.GetLayerIndex("Left"), 0);
             anim.SetLayerWeight(anim.GetLayerIndex("Right"), 0);
         }
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+            restartButton.enabled = true;
+            restartText.enabled = true;
+            hud.SetActive(false); 
+        }
     }
 
     void FixedUpdate()
@@ -129,6 +142,12 @@ public class Player : MonoBehaviour
             healDisplay.text = healAmount.ToString();
             Destroy(other.gameObject);
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        healthDisplay.fillAmount = (float)health / (float)maxHealth;
     }
 
     private IEnumerator Heal()

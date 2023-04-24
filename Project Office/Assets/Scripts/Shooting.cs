@@ -20,8 +20,7 @@ public class Shooting : MonoBehaviour
     public float shellForce;
     public float reloadTime;
     public float cooldownTime;
-    [HideInInspector]
-    public float cooldown;
+    [HideInInspector] public float cooldown;
     public int magSize;
     public int ammoAmount;
     private int magOccupancy;

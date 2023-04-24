@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7970251010353729702}
   m_Layer: 6
   m_Name: Grey brick wall
-  m_TagString: Untagged
+  m_TagString: Solid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -102,7 +102,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8, y: 4.98}
+    oldSize: {x: 8, y: 4.984375}
     newSize: {x: 8, y: 4.98}
     adaptiveTilingThreshold: 0.5
     drawMode: 2

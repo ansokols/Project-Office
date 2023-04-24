@@ -21,6 +21,13 @@ public class PistolBullet : MonoBehaviour
             collision.collider.transform.parent.GetComponent<Enemy>().TakeDamage(damage);
             Destroy(effect, 60f);
         }
+        else if (collision.collider.CompareTag("Player"))
+        {
+            GameObject effect = Instantiate(enemyHitEffect, transform.position, Quaternion.identity  * Quaternion.Euler(0, 0, Random.Range(0f, 360f)));
+            Instantiate(enemyHitSprite, effect.transform.position, effect.transform.rotation);
+            collision.collider.transform.parent.GetComponent<Player>().TakeDamage(damage);
+            Destroy(effect, 60f);
+        }
         else
         {
             GameObject effect = Instantiate(wallHitEffect, transform.position, Quaternion.identity);

@@ -4,9 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Enemy
   - Ammo
   - Heal
+  - Agent
+  - Enemy
+  - Solid
   layers:
   - Default
   - TransparentFX

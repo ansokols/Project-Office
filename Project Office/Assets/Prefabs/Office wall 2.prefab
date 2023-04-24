@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8317799371578145314}
   m_Layer: 6
   m_Name: White pixel (1)
-  m_TagString: Untagged
+  m_TagString: Solid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 8043597397498367771}
   m_Layer: 6
   m_Name: White pixel
-  m_TagString: Untagged
+  m_TagString: Solid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -346,7 +346,7 @@ MonoBehaviour:
   - {x: 2.0482101, y: -2.236967, z: 0}
   m_ShapePathHash: -436224195
   m_Mesh: {fileID: 0}
-  m_InstanceId: 161914
+  m_InstanceId: 383154
   m_LocalBounds:
     m_Center: {x: 0.9490814, y: -0.00068569183, z: 0}
     m_Extent: {x: 1.0991287, y: 2.2362814, z: 0}
