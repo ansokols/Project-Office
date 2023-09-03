@@ -52,10 +52,8 @@ public class Enemy : MonoBehaviour
     private Transform raycast;
     private RaycastHit2D[] allHits;
 
-    //private Rigidbody2D rb;
     private Animator feetAnim;
     private Animator bodyAnim;
-    //private Vector3 pos;
     private Vector2 moveVector;
     private int walkingMode;
     private bool isPlayerDetected;
@@ -64,7 +62,6 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //rb = GetComponent<Rigidbody2D>();
         feetAnim = GetComponent<Animator>();
         bodyAnim = transform.Find("Body").gameObject.GetComponent<Animator>();
         raycast = transform.Find("Raycast").gameObject.GetComponent<Transform>();
@@ -104,8 +101,7 @@ public class Enemy : MonoBehaviour
                     }
                 }
             }
-
-            if (isPlayerDetected)
+            else
             {
                 if (Vector2.Distance(transform.position, player.position) > visionDistance)
                 {
@@ -130,7 +126,6 @@ public class Enemy : MonoBehaviour
                         feetAnim.SetInteger("walkingMode", 2);
                     }
 
-                    //pos = Vector3.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
                     moveVector = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
                     RotateTowardsTarget();
                     Attack();
@@ -149,7 +144,6 @@ public class Enemy : MonoBehaviour
                         feetAnim.SetInteger("walkingMode", 1);
                     }
 
-                    //pos = Vector3.MoveTowards(transform.position, player.position, -speed/2 * Time.deltaTime);
                     moveVector = Vector2.MoveTowards(transform.position, player.position, -speed/2 * Time.deltaTime);
                     RotateTowardsTarget();
                     Attack();
@@ -193,7 +187,6 @@ public class Enemy : MonoBehaviour
     {
         if (walkingMode != 0)
         {
-            //rb.MovePosition(pos);
             transform.position = moveVector;
         }
     }
