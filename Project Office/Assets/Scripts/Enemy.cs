@@ -20,6 +20,10 @@ public class Enemy : MonoBehaviour
     public float visionDistance;
     public float stoppingDistance;
     public float retreatDistance;
+    [Range(0,360)]
+    public float centralFOV;
+    [Range(0,360)]
+    public float peripheralFOV;
     [Range(0, 1)]
     public float healDropChance;
 
@@ -49,7 +53,7 @@ public class Enemy : MonoBehaviour
     public AudioClip shellsSFX;
 
     [field: SerializeField, Header("Raycast")] private float rotationSpeed;
-    private Transform raycast;
+    //private Transform raycast;
     private RaycastHit2D[] allHits;
 
     private Animator feetAnim;
@@ -57,14 +61,14 @@ public class Enemy : MonoBehaviour
     private Vector2 moveVector;
     private int walkingMode;
     private bool isPlayerDetected;
-    private static int enemyAmount; 
+    private static int enemyAmount;
 
     // Start is called before the first frame update
     void Start()
     {
         feetAnim = GetComponent<Animator>();
         bodyAnim = transform.Find("Body").gameObject.GetComponent<Animator>();
-        raycast = transform.Find("Raycast").gameObject.GetComponent<Transform>();
+        //raycast = transform.Find("Raycast").gameObject.GetComponent<Transform>();
         magOccupancy = Random.Range(0, magSize + 1);
 
         enemyAmount = 14;
@@ -80,24 +84,47 @@ public class Enemy : MonoBehaviour
         {
             if (!isPlayerDetected)
             {
-                raycast.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
-                allHits = Physics2D.RaycastAll(raycast.position, raycast.right, visionDistance);
-                for (int i = 1; i < allHits.Length; i++)
+                if (Vector2.Distance(transform.position, player.position) <= visionDistance)
                 {
-                    if (allHits[i].collider.tag == "Solid")
+                    //raycast.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
+                    //allHits = Physics2D.RaycastAll(raycast.position, raycast.right, visionDistance);
+
+                    Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -peripheralFOV / 2);
+                    Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, peripheralFOV / 2);
+                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * visionDistance, Color.blue);
+                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * visionDistance, Color.blue);
+
+                    Vector2 directionToPlayer = (player.position - transform.position).normalized;
+                    float angleToPlayer = Vector2.Angle(transform.right, directionToPlayer);
+
+                    if (angleToPlayer <= peripheralFOV / 2)
                     {
-                        Debug.DrawLine(raycast.position, allHits[i].point, Color.yellow);
-                        break;
-                    }
-                    else if (allHits[i].collider.tag == "Player")
-                    {
-                        Debug.DrawLine(raycast.position, allHits[i].point, Color.green);
-                        isPlayerDetected = true;
-                        break;
+                        int enemiesLayer = 8;
+                        int layerMask = 1 << enemiesLayer;
+                        layerMask = ~layerMask;
+                        allHits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionDistance, layerMask);
+
+                        //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
+                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.yellow);
+                        for (int i = 0; i < allHits.Length; i++)
+                        {
+                            if (allHits[i].collider.tag == "Solid")
+                            {
+                                Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.red);
+                                Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
+                                break;
+                            }
+                            else if (allHits[i].collider.tag == "Player")
+                            {
+                                Debug.DrawLine(transform.position, allHits[i].point, Color.green);
+                                isPlayerDetected = true;
+                                break;
+                            }
+                        }             
                     }
                     else
                     {
-                        Debug.DrawLine(raycast.position, raycast.position + raycast.right * visionDistance, Color.red);
+                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.black);
                     }
                 }
             }
@@ -128,7 +155,7 @@ public class Enemy : MonoBehaviour
 
                     moveVector = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
                     RotateTowardsTarget();
-                    Attack();
+                    //Attack();
                 }
                 else if (Vector2.Distance(transform.position, player.position) < retreatDistance)
                 {
@@ -146,7 +173,7 @@ public class Enemy : MonoBehaviour
 
                     moveVector = Vector2.MoveTowards(transform.position, player.position, -speed/2 * Time.deltaTime);
                     RotateTowardsTarget();
-                    Attack();
+                    //Attack();
                 }
                 else
                 {
@@ -157,7 +184,7 @@ public class Enemy : MonoBehaviour
                     feetAnim.SetInteger("walkingMode", 0);
 
                     RotateTowardsTarget();
-                    Attack();
+                    //Attack();
                 }
             }
 
@@ -198,9 +225,8 @@ public class Enemy : MonoBehaviour
 
     private void RotateTowardsTarget()
     {
-        Vector2 direction = player.position - transform.position;
-        direction.Normalize();
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;       
+        Vector2 directionToPlayer = (player.position - transform.position).normalized;
+        float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;       
         transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
     }
 
@@ -262,5 +288,12 @@ public class Enemy : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         playerAudioSource.PlayOneShot(clip, volume);
+    }
+
+    private Vector2 DirectionFromAngle(float eulerY, float angleInDegrees)
+    {
+        angleInDegrees -= eulerY - 90;
+
+        return new Vector2(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 }
