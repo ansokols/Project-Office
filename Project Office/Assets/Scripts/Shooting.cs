@@ -8,31 +8,31 @@ public class Shooting : MonoBehaviour
     private Animator anim;
 
     [Header("Objects")]
-    public Transform firePoint;
-    public GameObject bulletPrefab;
-    public GameObject shellPrefab;
-    public GameObject flashEffect;
-    public Text ammoDisplay;
-    public Image magDisplay;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private GameObject shellPrefab;
+    [SerializeField] private GameObject flashEffect;
+    [SerializeField] private Text ammoDisplay;
+    [SerializeField] private Image magDisplay;
 
     [Header("Characteristics")]
-    public float bulletForce;
-    public float shellForce;
-    public float reloadTime;
-    public float cooldownTime;
-    [HideInInspector] public float cooldown;
-    public int magSize;
-    public int ammoAmount;
+    [SerializeField] private float bulletForce;
+    [SerializeField] private float shellForce;
+    [SerializeField] private float reloadTime;
+    [SerializeField] private float cooldownTime;
+    public float cooldown {get; set;}
+    [SerializeField] private int magSize;
+    [SerializeField] private int ammoAmount;
     private int magOccupancy;
 
     [Header("Audio")]
-    public AudioSource playerAudioSource;
-    public AudioSource interactionAudioSource;
-    public AudioClip shotSFX;
-    public AudioClip drySFX;
-    public AudioClip reloadSFX;
-    public AudioClip shellsSFX;
-    public AudioClip ammoPickupSFX;
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioSource interactionAudioSource;
+    [SerializeField] private AudioClip shotSFX;
+    [SerializeField] private AudioClip drySFX;
+    [SerializeField] private AudioClip reloadSFX;
+    [SerializeField] private AudioClip shellsSFX;
+    [SerializeField] private AudioClip ammoPickupSFX;
 
     // Start is called before the first frame update
     void Start()

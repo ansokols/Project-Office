@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2616142717043699349}
   - component: {fileID: 7759071086613911023}
-  - component: {fileID: 1659237730681845343}
   m_Layer: 0
   m_Name: Office chair (1)
   m_TagString: Untagged
@@ -85,22 +84,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &1659237730681845343
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1529440667670402093}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.0000019073486, y: 0}
-  serializedVersion: 2
-  m_Radius: 5.3150005
 --- !u!1 &8391189669142695408
 GameObject:
   m_ObjectHideFlags: 0
@@ -112,6 +95,7 @@ GameObject:
   - component: {fileID: 8391189669142695411}
   - component: {fileID: 8391189669142695420}
   - component: {fileID: 8391189669142695410}
+  - component: {fileID: 1221694756742673757}
   m_Layer: 0
   m_Name: Office chair
   m_TagString: Untagged
@@ -204,6 +188,22 @@ CircleCollider2D:
   m_Offset: {x: -0.0000019073486, y: 0}
   serializedVersion: 2
   m_Radius: 5.3150005
+--- !u!114 &1221694756742673757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8391189669142695408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff
 --- !u!1 &8547527112030017360
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,7 +214,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2004742301312091050}
   - component: {fileID: 6783495102575847193}
-  - component: {fileID: 9028900641663590427}
   m_Layer: 0
   m_Name: Office chair
   m_TagString: Untagged
@@ -289,19 +288,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &9028900641663590427
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8547527112030017360}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.0000019073486, y: 0}
-  serializedVersion: 2
-  m_Radius: 5.3150005

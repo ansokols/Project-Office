@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7100876115052010385}
   - component: {fileID: 6679938138670796975}
-  - component: {fileID: 6680491895083573359}
   m_Layer: 0
   m_Name: Armchair 1 shadow
   m_TagString: Untagged
@@ -85,22 +84,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &6680491895083573359
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 815463026596271878}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.0000019073486, y: 0.0000019073486}
-  serializedVersion: 2
-  m_Radius: 0.85
 --- !u!1 &1369513905473840026
 GameObject:
   m_ObjectHideFlags: 0
@@ -112,6 +95,7 @@ GameObject:
   - component: {fileID: 1369513905473840028}
   - component: {fileID: 1369513905473840027}
   - component: {fileID: 6246413274787902533}
+  - component: {fileID: 6814174933049800279}
   m_Layer: 0
   m_Name: Armchair 1 (purple)
   m_TagString: Untagged
@@ -204,6 +188,22 @@ CircleCollider2D:
   m_Offset: {x: -0.0000019073486, y: 0.0000019073486}
   serializedVersion: 2
   m_Radius: 0.85
+--- !u!114 &6814174933049800279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1369513905473840026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff
 --- !u!1 &5408305194190615716
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,7 +214,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7124652708340687926}
   - component: {fileID: 6798396084367481539}
-  - component: {fileID: 4588481396831176210}
   m_Layer: 0
   m_Name: Armchair 1 shadow (1)
   m_TagString: Untagged
@@ -289,19 +288,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &4588481396831176210
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5408305194190615716}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.0000019073486, y: 0.0000019073486}
-  serializedVersion: 2
-  m_Radius: 0.85

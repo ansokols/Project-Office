@@ -6,31 +6,31 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     [Header("Objects")]
-    public Camera cam;
-    public Image healthDisplay;
-    public Text healDisplay;
-    public Image restartButton;
-    public Text restartText;
-    public GameObject hud;
+    [SerializeField] private Camera cam;
+    [SerializeField] private Image healthDisplay;
+    [SerializeField] private Text healDisplay;
+    [SerializeField] private Image restartButton;
+    [SerializeField] private Text restartText;
+    [SerializeField] private GameObject hud;
 
     [Header("Characteristics")]
-    public float speed;
-    public float runningSpeed;
-    public int maxHealth;
-    public int health;
-    public int healCapacity;
-    public int healAmount;
-    public int healImpact;
-    public float healTime;
+    [SerializeField] private float speed;
+    [SerializeField] private float runningSpeed;
+    [SerializeField] private int maxHealth;
+    [SerializeField] private int health;
+    [SerializeField] private int healCapacity;
+    [SerializeField] private int healAmount;
+    [SerializeField] private int healImpact;
+    [SerializeField] private float healTime;
 
     [Header("Audio")]
-    public AudioSource playerAudioSource;
-    public AudioSource interactionAudioSource;
-    public AudioSource movementAudioSource;
-    public AudioClip healPickupSFX;
-    public AudioClip healingSFX;
-    public AudioClip walkingSFX;
-    public AudioClip runningSFX;
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioSource interactionAudioSource;
+    [SerializeField] private AudioSource movementAudioSource;
+    [SerializeField] private AudioClip healPickupSFX;
+    [SerializeField] private AudioClip healingSFX;
+    [SerializeField] private AudioClip walkingSFX;
+    [SerializeField] private AudioClip runningSFX;
 
     private Rigidbody2D rb;
     private Animator anim;

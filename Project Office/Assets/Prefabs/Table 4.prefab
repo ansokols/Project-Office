@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4602087934930420831}
   - component: {fileID: 2769827316649895231}
-  - component: {fileID: 2499203964616646069}
   m_Layer: 0
   m_Name: Table 4 shadow (1)
   m_TagString: Untagged
@@ -85,22 +84,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &2499203964616646069
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2598873658703078864}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.0033788686, y: -6.44468e-10}
-  m_Size: {x: 4.8005576, y: 3.6000745}
-  m_Direction: 1
 --- !u!1 &4589761691623748001
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,7 +94,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3407272362889047332}
   - component: {fileID: 8377557530111150079}
-  - component: {fileID: 2054495730361413250}
   m_Layer: 0
   m_Name: Table 4 shadow
   m_TagString: Untagged
@@ -186,22 +168,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &2054495730361413250
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4589761691623748001}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.0033788686, y: -6.44468e-10}
-  m_Size: {x: 4.8005576, y: 3.6000745}
-  m_Direction: 1
 --- !u!1 &5870579105352465882
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +179,7 @@ GameObject:
   - component: {fileID: 5870579105352465893}
   - component: {fileID: 5870579105352465892}
   - component: {fileID: 5870579105352465883}
+  - component: {fileID: 290667895603166568}
   m_Layer: 0
   m_Name: Table 4
   m_TagString: Untagged
@@ -305,3 +272,19 @@ CapsuleCollider2D:
   m_Offset: {x: 0.0033788686, y: -6.44468e-10}
   m_Size: {x: 4.8005576, y: 3.6000745}
   m_Direction: 1
+--- !u!114 &290667895603166568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5870579105352465882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff

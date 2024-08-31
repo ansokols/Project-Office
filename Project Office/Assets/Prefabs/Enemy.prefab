@@ -142,7 +142,7 @@ MonoBehaviour:
   - {x: -0.056366116, y: -0.43619597, z: 0}
   m_ShapePathHash: 1005603365
   m_Mesh: {fileID: 0}
-  m_InstanceId: 47672
+  m_InstanceId: 302488
   m_LocalBounds:
     m_Center: {x: -0.22457296, y: 0.022553742, z: 0}
     m_Extent: {x: 0.58225405, y: 0.53323877, z: 0}
@@ -235,6 +235,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3089915087477956683}
   - component: {fileID: 3089915087477956682}
+  - component: {fileID: 8363256125991653446}
+  - component: {fileID: 1458378375723788551}
   - component: {fileID: 3089915087477956693}
   - component: {fileID: 3089915087477956694}
   - component: {fileID: 3089915087477956695}
@@ -254,8 +256,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3089915087477956688}
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.42, y: -0.71, z: 10}
+  m_LocalRotation: {x: 0, y: 0, z: -0.89955777, w: 0.43680182}
+  m_LocalPosition: {x: 4.57, y: 6.65, z: -3.3459044}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -265,7 +267,7 @@ Transform:
   - {fileID: 3089915087344741813}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -128.2}
 --- !u!114 &3089915087477956682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,7 +275,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3089915087477956688}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb39f29d9c8b7754ab19beb6f6331119, type: 3}
   m_Name: 
@@ -290,6 +292,8 @@ MonoBehaviour:
   visionDistance: 20
   stoppingDistance: 6
   retreatDistance: 4
+  centralFOV: 60
+  peripheralFOV: 120
   healDropChance: 0.25
   firePoint: {fileID: 3089915088935297783}
   bulletPrefab: {fileID: 767460807071786867, guid: 917b20d5fafa77e4b9298c24325a753a, type: 3}
@@ -310,6 +314,72 @@ MonoBehaviour:
   reloadSFX: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
   shellsSFX: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
   rotationSpeed: 1000
+--- !u!114 &8363256125991653446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3089915087477956688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 523508b669848dc4ea1e20320766c638, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoBoxPrefab: {fileID: 5035258833829736881, guid: ed5d3078b8b55314fa1324cc3741b7ef, type: 3}
+  healBoxPrefab: {fileID: 247782636309783506, guid: 37133d3cdfe0a97469cc01c73fb8a847, type: 3}
+  player: {fileID: 0}
+  restartButton: {fileID: 0}
+  restartText: {fileID: 0}
+  winText: {fileID: 0}
+  hud: {fileID: 0}
+  health: 100
+  speed: 5
+  visionDistance: 20
+  stoppingDistance: 6
+  retreatDistance: 4
+  centralFOV: 60
+  peripheralFOV: 120
+  healDropChance: 0.25
+  firePoint: {fileID: 3089915088935297783}
+  bulletPrefab: {fileID: 767460807071786867, guid: 917b20d5fafa77e4b9298c24325a753a, type: 3}
+  shellPrefab: {fileID: 9145559371113436495, guid: 029b263de288d8e4c8f72da0400c014c, type: 3}
+  flashEffect: {fileID: 700682518664992690, guid: bd61bbb92256679438ebbfa250076c21, type: 3}
+  bulletForce: 100
+  bulletSpread: 0.15
+  shellForce: 10
+  reloadTime: 2.5
+  cooldownTime: 1
+  magSize: 12
+  movementAudioSource: {fileID: 3089915087477956686}
+  walkingSFX: {fileID: 8300000, guid: 1200572a9c4e1144f8a5f78696cc81f7, type: 3}
+  runningSFX: {fileID: 8300000, guid: 3fa573a8816a5804682d3f536982da33, type: 3}
+  playerAudioSource: {fileID: 3089915087477956687}
+  shotSFX: {fileID: 8300000, guid: 591836c792c42f345bbe32f3419b298b, type: 3}
+  reloadSFX: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
+  shellsSFX: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
+--- !u!195 &1458378375723788551
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3089915087477956688}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.75
+  m_Speed: 5
+  m_Acceleration: 12
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1.45
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!50 &3089915087477956693
 Rigidbody2D:
   serializedVersion: 4

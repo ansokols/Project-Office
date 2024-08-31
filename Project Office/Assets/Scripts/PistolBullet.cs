@@ -5,12 +5,12 @@ using UnityEngine;
 public class PistolBullet : MonoBehaviour
 {
     [Header("Objects")]
-    public GameObject wallHitEffect;
-    public GameObject enemyHitEffect;
-    public GameObject enemyHitSprite;
+    [SerializeField] private GameObject wallHitEffect;
+    [SerializeField] private GameObject enemyHitEffect;
+    [SerializeField] private GameObject enemyHitSprite;
 
     [Header("Characteristics")]
-    public int damage;
+    [SerializeField] private int damage;
 
     void OnCollisionEnter2D(Collision2D collision)
     {
@@ -18,7 +18,7 @@ public class PistolBullet : MonoBehaviour
         {
             GameObject effect = Instantiate(enemyHitEffect, transform.position, Quaternion.identity  * Quaternion.Euler(0, 0, Random.Range(0f, 360f)));
             Instantiate(enemyHitSprite, effect.transform.position, effect.transform.rotation);
-            collision.collider.transform.parent.GetComponent<Enemy>().TakeDamage(damage);
+            collision.collider.transform.parent.GetComponent<BetterEnemy>().TakeDamage(damage);
             Destroy(effect, 60f);
         }
         else if (collision.collider.CompareTag("Player"))

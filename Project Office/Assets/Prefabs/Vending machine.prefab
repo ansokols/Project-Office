@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 2785892986896789964}
   - component: {fileID: 2785892986896789963}
   - component: {fileID: 2785892986896789966}
+  - component: {fileID: 1276119197269746805}
   m_Layer: 6
   m_Name: Vending machine
   m_TagString: Solid
@@ -229,6 +230,22 @@ MonoBehaviour:
   m_LocalBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 1.4, y: 1.68, z: 0}
+--- !u!114 &1276119197269746805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2785892986896789962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff
 --- !u!1 &2785892987067193335
 GameObject:
   m_ObjectHideFlags: 0

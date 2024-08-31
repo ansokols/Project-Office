@@ -5,15 +5,15 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     [Header("Objects")]
-    public Transform target;
+    [SerializeField] private Transform target;
 
     [Header("Characteristics")]
     [Range(0, 5)]
-    public float followSpeed;
-    public Vector3 positionOffset;
-    public float zoomMin;
-    public float zoomMax;
-    public float scrollSpeed;
+    [SerializeField] private float followSpeed;
+    [SerializeField] private Vector3 positionOffset;
+    [SerializeField] private float zoomMin;
+    [SerializeField] private float zoomMax;
+    [SerializeField] private float scrollSpeed;
 
     // Update is called once per frame
     void Update()
