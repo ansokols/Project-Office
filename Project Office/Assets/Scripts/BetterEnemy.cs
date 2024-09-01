@@ -18,13 +18,17 @@ public class BetterEnemy : MonoBehaviour
     [Header("Enemy Characteristics")]
     [SerializeField] private int health;
     [SerializeField] private float speed;
+    [SerializeField] private float instantDetectionDistance;
+    [SerializeField] private float detectionDistance;
     [SerializeField] private float visionDistance;
     [SerializeField] private float stoppingDistance;
     [SerializeField] private float retreatDistance;
     [Range(0,360)]
     [SerializeField] private float centralFOV;
     [Range(0,360)]
-    [SerializeField] private float peripheralFOV;
+    [SerializeField] private float midPeripheralFOV;
+    [Range(0,360)]
+    [SerializeField] private float farPeripheralFOV;
     [Range(0, 1)]
     [SerializeField] private float healDropChance;
 
@@ -53,22 +57,41 @@ public class BetterEnemy : MonoBehaviour
     [SerializeField] private AudioClip reloadSFX;
     [SerializeField] private AudioClip shellsSFX;
 
-    private RaycastHit2D[] allHits;
-
     private NavMeshAgent agent;
+    private Vector2 currentTarget;
+    private float pathUpdateDelay;
+    private float pathUpdateDeadline;
+    private float extraDetectionTime;
+    private float extraDetectionTimeDeadline;
+    private int enemiesLayer;
+    private int layerMask;
+
     private Animator legsAnim;
     private Animator bodyAnim;
-    private Vector2 moveVector;
     private int walkingMode;
-    private bool isPlayerDetected;
     private static int enemyAmount;
+
+    private enum EnemyState
+    {
+        Idle,
+        Patrol,
+        Battle,
+        Search
+    }
+    private EnemyState currentState;
 
     // Start is called before the first frame update
     void Start()
     {
+        currentState = EnemyState.Idle;
+
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+        pathUpdateDelay = 0.2f;
+        extraDetectionTime = 0.5f;
+        enemiesLayer = 8;
+        layerMask = ~(1 << enemiesLayer);
 
         legsAnim = GetComponent<Animator>();
         bodyAnim = transform.Find("Body").gameObject.GetComponent<Animator>();
@@ -85,116 +108,149 @@ public class BetterEnemy : MonoBehaviour
     {
         if (player != null)
         {
-            if (!isPlayerDetected)
+            Vector2 directionToPlayer = (player.position - transform.position).normalized;
+            
+            switch (currentState)
             {
-                if (Vector2.Distance(transform.position, player.position) <= visionDistance)
-                {
-                    Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -peripheralFOV / 2);
-                    Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, peripheralFOV / 2);
-                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * visionDistance, Color.blue);
-                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * visionDistance, Color.blue);
-
-                    Vector2 directionToPlayer = (player.position - transform.position).normalized;
-                    float angleToPlayer = Vector2.Angle(transform.right, directionToPlayer);
-
-                    if (angleToPlayer <= peripheralFOV / 2)
+                default:
+                case EnemyState.Idle:
+                    if (Vector2.Distance(transform.position, player.position) <= instantDetectionDistance)
                     {
-                        int enemiesLayer = 8;
-                        int layerMask = 1 << enemiesLayer;
-                        layerMask = ~layerMask;
-                        allHits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionDistance, layerMask);
+                        currentTarget = player.position;
+                        UpdateEnemyPath(currentTarget);
+                        currentState = EnemyState.Battle;
+                    }
+                    else if (Vector2.Distance(transform.position, player.position) <= detectionDistance)
+                    {
+                        Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -midPeripheralFOV / 2);
+                        Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, midPeripheralFOV / 2);
+                        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * detectionDistance, Color.blue);
+                        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * detectionDistance, Color.blue);
 
-                        //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.yellow);
-                        for (int i = 0; i < allHits.Length; i++)
+                        float angleToPlayer = Vector2.Angle(transform.right, directionToPlayer);
+
+                        if (angleToPlayer <= midPeripheralFOV / 2)
                         {
-                            if (allHits[i].collider.tag == "Solid")
+                            if (isTargetVisible(directionToPlayer, detectionDistance))
                             {
-                                Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.red);
-                                Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
-                                break;
+                                currentTarget = player.position;
+                                UpdateEnemyPath(currentTarget);
+                                currentState = EnemyState.Battle;
                             }
-                            else if (allHits[i].collider.tag == "Player")
+                        }
+                        else
+                        {
+                            Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * detectionDistance, Color.black);
+                        }
+                    }
+                    break;
+
+                case EnemyState.Battle:
+                    agent.speed = speed;
+
+                    if(agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.1 && (Vector2)agent.destination == currentTarget)
+                    {
+                        movementAudioSource.Stop();
+                        walkingMode = 0;
+                        currentState = EnemyState.Idle;
+
+                        bodyAnim.SetBool("isRunning", false);
+                        legsAnim.SetInteger("walkingMode", 0);
+                    }
+                    else if (Vector2.Distance(transform.position, player.position) > stoppingDistance)
+                    {
+                        if (walkingMode != 2)
+                        {
+                            movementAudioSource.Stop();
+                            walkingMode = 2;
+                            movementAudioSource.clip = runningSFX;
+                            movementAudioSource.volume = 0.25f;
+                            movementAudioSource.Play();
+
+                            bodyAnim.SetBool("isRunning", true);
+                            legsAnim.SetInteger("walkingMode", 2);
+                        }
+
+                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        {
+                            currentTarget = player.position;
+                            UpdateEnemyPath(currentTarget);
+                            RotateTowardsTarget(currentTarget);
+                            Attack();
+                            extraDetectionTimeDeadline = extraDetectionTime + Time.time;
+                        }
+                        else
+                        {
+                            RotateTowardsMovement();
+                            if (Time.time <= extraDetectionTimeDeadline)
                             {
-                                Debug.DrawLine(transform.position, allHits[i].point, Color.green);
-                                isPlayerDetected = true;
-                                break;
+                                currentTarget = player.position;
+                                UpdateEnemyPath(currentTarget);
                             }
-                        }             
+                        }
+                    }
+                    else if (Vector2.Distance(transform.position, player.position) < retreatDistance)
+                    {
+                        if (walkingMode != 1)
+                        {
+                            movementAudioSource.Stop();
+                            walkingMode = 1;
+                            movementAudioSource.clip = walkingSFX;
+                            movementAudioSource.volume = 0.125f;
+                            movementAudioSource.Play();
+
+                            bodyAnim.SetBool("isRunning", true);
+                            legsAnim.SetInteger("walkingMode", 1);
+                        }
+                        
+                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        {
+                            currentTarget = player.position;
+                            Vector2 target = (Vector2)transform.position - directionToPlayer * stoppingDistance;
+                            UpdateEnemyPath(target);
+                            RotateTowardsTarget(currentTarget);
+                            Attack();
+                            extraDetectionTimeDeadline = extraDetectionTime + Time.time;
+                        }
+                        else
+                        {
+                            UpdateEnemyPath(currentTarget);
+                            RotateTowardsMovement();
+                            if (Time.time <= extraDetectionTimeDeadline)
+                            {
+                                currentTarget = player.position;
+                                UpdateEnemyPath(currentTarget);
+                            }
+                        }
                     }
                     else
                     {
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.black);
-                    }
-                }
-            }
-            else
-            {
-                if (Vector2.Distance(transform.position, player.position) > visionDistance)
-                {
-                    movementAudioSource.Stop();
-                    walkingMode = 0;
-                    isPlayerDetected = false;
-
-                    bodyAnim.SetBool("isRunning", false);
-                    legsAnim.SetInteger("walkingMode", 0);
-
-                    agent.ResetPath();
-                }
-                else if (Vector2.Distance(transform.position, player.position) > stoppingDistance)
-                {
-                    if (walkingMode != 2)
-                    {
                         movementAudioSource.Stop();
-                        walkingMode = 2;
-                        movementAudioSource.clip = runningSFX;
-                        movementAudioSource.volume = 0.25f;
-                        movementAudioSource.Play();
+                        walkingMode = 0;
 
-                        bodyAnim.SetBool("isRunning", true);
-                        legsAnim.SetInteger("walkingMode", 2);
+                        bodyAnim.SetBool("isRunning", false);
+                        legsAnim.SetInteger("walkingMode", 0);
+
+                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        {
+                            agent.speed = 0;
+                            currentTarget = player.position;
+                            UpdateEnemyPath(currentTarget);
+                            RotateTowardsTarget(currentTarget);
+                            Attack();
+                            extraDetectionTimeDeadline = extraDetectionTime + Time.time;
+                        }
+                        else
+                        { 
+                            RotateTowardsMovement();
+                            if (Time.time <= extraDetectionTimeDeadline)
+                            {
+                                currentTarget = player.position;
+                                UpdateEnemyPath(currentTarget);
+                            }
+                        }
                     }
-
-                    //moveVector = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
-                    agent.SetDestination(player.position);
-                    RotateTowardsTarget();
-                    Attack();
-                }
-                else if (Vector2.Distance(transform.position, player.position) < retreatDistance)
-                {
-                    if (walkingMode != 1)
-                    {
-                        movementAudioSource.Stop();
-                        walkingMode = 1;
-                        movementAudioSource.clip = walkingSFX;
-                        movementAudioSource.volume = 0.125f;
-                        movementAudioSource.Play();
-
-                        bodyAnim.SetBool("isRunning", true);
-                        legsAnim.SetInteger("walkingMode", 1);
-                    }
-
-                    //moveVector = Vector2.MoveTowards(transform.position, player.position, -speed/2 * Time.deltaTime);
-                    Vector2 directionToPlayer = (player.position - transform.position).normalized;
-                    Vector2 newPos = (Vector2)transform.position - directionToPlayer * stoppingDistance;
-                    //Vector2 directionToPlayer = transform.position - player.position;
-                    //Vector2 newPos = (Vector2)transform.position + directionToPlayer;
-                    agent.SetDestination(newPos);
-                    RotateTowardsTarget();
-                    Attack();
-                }
-                else
-                {
-                    movementAudioSource.Stop();
-                    walkingMode = 0;
-
-                    bodyAnim.SetBool("isRunning", false);
-                    legsAnim.SetInteger("walkingMode", 0);
-
-                    RotateTowardsTarget();
-                    agent.ResetPath();
-                    Attack();
-                }
+                    break;
             }
 
             if (health <= 0)
@@ -227,16 +283,56 @@ public class BetterEnemy : MonoBehaviour
         }
     }
 */
+
     public void TakeDamage(int damage)
     {
         health -= damage;
     }
 
-    private void RotateTowardsTarget()
+    private void UpdateEnemyPath(Vector2 target)
     {
-        Vector2 directionToPlayer = (player.position - transform.position).normalized;
-        float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;       
-        transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
+        if (Time.time >= pathUpdateDeadline) {
+            pathUpdateDeadline = Time.time + pathUpdateDelay;
+            agent.SetDestination(target);
+        }
+    }
+
+    private bool isTargetVisible(Vector2 directionToTarget, float distance)
+    {
+        RaycastHit2D[] allHits = Physics2D.RaycastAll(transform.position, directionToTarget, distance, layerMask);
+
+        //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
+        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
+        for (int i = 0; i < allHits.Length; i++)
+        {
+            if (allHits[i].collider.tag == "Solid")
+            {
+                Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
+                Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
+                break;
+            }
+            if (allHits[i].collider.tag == "Player")
+            {
+                Debug.DrawLine(transform.position, allHits[i].point, Color.green);
+                return true;
+            }
+        } 
+        return false;            
+    }
+
+    private void RotateTowardsMovement()
+    {
+        float angle = Mathf.Atan2(agent.velocity.y, agent.velocity.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 10 * Time.deltaTime);
+    }
+
+    private void RotateTowardsTarget(Vector2 target)
+    {
+        Vector2 directionToTarget = (target - (Vector2)transform.position).normalized;
+        float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;       
+        //transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
+        //transform.rotation = Quaternion.Slerp(transform.rotation, angle, 0.2f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 5 * Time.deltaTime);
     }
 
     private void Attack()
