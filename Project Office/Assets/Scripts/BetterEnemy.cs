@@ -57,19 +57,24 @@ public class BetterEnemy : MonoBehaviour
     [SerializeField] private AudioClip reloadSFX;
     [SerializeField] private AudioClip shellsSFX;
 
-    private NavMeshAgent agent;
-    private Vector2 currentTarget;
-    private float pathUpdateDelay;
-    private float pathUpdateDeadline;
-    private float extraDetectionTime;
-    private float extraDetectionTimeDeadline;
-    private int enemiesLayer;
-    private int layerMask;
-
     private Animator legsAnim;
     private Animator bodyAnim;
-    private int walkingMode;
+    private NavMeshAgent agent;
+    private Vector3 currentTarget;
+
+    private int enemiesLayer;
+    private int layerMask;
+  
     private static int enemyAmount;
+    private int walkingMode;
+
+    private float pathUpdateDelay;
+    private float pathUpdateDeadline;
+    private float detectionLevel;
+    private float midPFOVdetectionTime;
+    private float farPFOVdetectionTime;
+    private float extraDetectionTime;
+    private float extraDetectionTimeDeadline;
 
     private enum EnemyState
     {
@@ -78,12 +83,20 @@ public class BetterEnemy : MonoBehaviour
         Battle,
         Search
     }
-    private EnemyState currentState;
+    private EnemyState currentEnemyState;
+
+    private enum VisionState
+    {
+        NotVisible,
+        CentralFOV,
+        MidPeripheralFOV,
+        FarPeripheralFOV
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        currentState = EnemyState.Idle;
+        currentEnemyState = EnemyState.Idle;
 
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
@@ -92,6 +105,10 @@ public class BetterEnemy : MonoBehaviour
         extraDetectionTime = 0.5f;
         enemiesLayer = 8;
         layerMask = ~(1 << enemiesLayer);
+
+        detectionLevel = 0f;
+        midPFOVdetectionTime = 4f;
+        farPFOVdetectionTime = 7f;
 
         legsAnim = GetComponent<Animator>();
         bodyAnim = transform.Find("Body").gameObject.GetComponent<Animator>();
@@ -109,8 +126,8 @@ public class BetterEnemy : MonoBehaviour
         if (player != null)
         {
             Vector2 directionToPlayer = (player.position - transform.position).normalized;
-            
-            switch (currentState)
+
+            switch (currentEnemyState)
             {
                 default:
                 case EnemyState.Idle:
@@ -118,29 +135,58 @@ public class BetterEnemy : MonoBehaviour
                     {
                         currentTarget = player.position;
                         UpdateEnemyPath(currentTarget);
-                        currentState = EnemyState.Battle;
+                        currentEnemyState = EnemyState.Battle;
+                        break;
                     }
-                    else if (Vector2.Distance(transform.position, player.position) <= detectionDistance)
+
+                    if (Vector2.Distance(transform.position, player.position) <= detectionDistance)
                     {
-                        Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -midPeripheralFOV / 2);
-                        Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, midPeripheralFOV / 2);
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * detectionDistance, Color.blue);
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * detectionDistance, Color.blue);
-
-                        float angleToPlayer = Vector2.Angle(transform.right, directionToPlayer);
-
-                        if (angleToPlayer <= midPeripheralFOV / 2)
+                        Debug.Log(detectionLevel);
+                        float detectionTimeDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
+                        VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
+                        switch (currentVisionState)
                         {
-                            if (isTargetVisible(directionToPlayer, detectionDistance))
-                            {
+                            default:
+                            case VisionState.NotVisible:
+                                if (detectionLevel >= detectionTimeDeadline)
+                                {
+                                    RotateTowardsTarget(currentTarget, 50f);
+                                }
+                                else if (detectionLevel > 0)
+                                {
+                                    detectionLevel -= (midPFOVdetectionTime + farPFOVdetectionTime) / 2 * Time.deltaTime;
+                                }
+                                break;
+
+                            case VisionState.CentralFOV:
                                 currentTarget = player.position;
                                 UpdateEnemyPath(currentTarget);
-                                currentState = EnemyState.Battle;
-                            }
-                        }
-                        else
-                        {
-                            Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * detectionDistance, Color.black);
+                                currentEnemyState = EnemyState.Battle;
+                                break;
+
+                            case VisionState.MidPeripheralFOV:
+                                if (detectionLevel >= detectionTimeDeadline)
+                                {
+                                    currentTarget = player.position;
+                                    RotateTowardsTarget(currentTarget, 50f);
+                                }
+                                else
+                                {
+                                    detectionLevel += detectionTimeDeadline / midPFOVdetectionTime * Time.deltaTime;
+                                }
+                                break;
+
+                            case VisionState.FarPeripheralFOV:
+                                if (detectionLevel >= detectionTimeDeadline)
+                                {
+                                    currentTarget = player.position;
+                                    RotateTowardsTarget(currentTarget, 50f);
+                                }
+                                else
+                                {
+                                    detectionLevel += detectionTimeDeadline / farPFOVdetectionTime * Time.deltaTime;
+                                }
+                                break;
                         }
                     }
                     break;
@@ -148,11 +194,11 @@ public class BetterEnemy : MonoBehaviour
                 case EnemyState.Battle:
                     agent.speed = speed;
 
-                    if(agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.1 && (Vector2)agent.destination == currentTarget)
+                    if(agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.1 && agent.destination == currentTarget)
                     {
                         movementAudioSource.Stop();
                         walkingMode = 0;
-                        currentState = EnemyState.Idle;
+                        currentEnemyState = EnemyState.Idle;
 
                         bodyAnim.SetBool("isRunning", false);
                         legsAnim.SetInteger("walkingMode", 0);
@@ -171,11 +217,11 @@ public class BetterEnemy : MonoBehaviour
                             legsAnim.SetInteger("walkingMode", 2);
                         }
 
-                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
                             currentTarget = player.position;
                             UpdateEnemyPath(currentTarget);
-                            RotateTowardsTarget(currentTarget);
+                            RotateTowardsTarget(currentTarget, 150f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
@@ -203,12 +249,12 @@ public class BetterEnemy : MonoBehaviour
                             legsAnim.SetInteger("walkingMode", 1);
                         }
                         
-                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
                             currentTarget = player.position;
                             Vector2 target = (Vector2)transform.position - directionToPlayer * stoppingDistance;
                             UpdateEnemyPath(target);
-                            RotateTowardsTarget(currentTarget);
+                            RotateTowardsTarget(currentTarget, 150f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
@@ -231,12 +277,12 @@ public class BetterEnemy : MonoBehaviour
                         bodyAnim.SetBool("isRunning", false);
                         legsAnim.SetInteger("walkingMode", 0);
 
-                        if (isTargetVisible(directionToPlayer, visionDistance))
+                        if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
                             agent.speed = 0;
                             currentTarget = player.position;
                             UpdateEnemyPath(currentTarget);
-                            RotateTowardsTarget(currentTarget);
+                            RotateTowardsTarget(currentTarget, 150f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
@@ -289,7 +335,7 @@ public class BetterEnemy : MonoBehaviour
         health -= damage;
     }
 
-    private void UpdateEnemyPath(Vector2 target)
+    private void UpdateEnemyPath(Vector3 target)
     {
         if (Time.time >= pathUpdateDeadline) {
             pathUpdateDeadline = Time.time + pathUpdateDelay;
@@ -297,27 +343,59 @@ public class BetterEnemy : MonoBehaviour
         }
     }
 
-    private bool isTargetVisible(Vector2 directionToTarget, float distance)
+    private VisionState getCurrentVisionState(Vector2 directionToTarget, float distance)
     {
-        RaycastHit2D[] allHits = Physics2D.RaycastAll(transform.position, directionToTarget, distance, layerMask);
+        //TODO добавить разные поля обзора в дебаг
+        Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -centralFOV / 2);
+        Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, centralFOV / 2);
+        Vector2 viewAngle3 = DirectionFromAngle(transform.eulerAngles.z, -midPeripheralFOV / 2);
+        Vector2 viewAngle4 = DirectionFromAngle(transform.eulerAngles.z, midPeripheralFOV / 2);
+        Vector2 viewAngle5 = DirectionFromAngle(transform.eulerAngles.z, -farPeripheralFOV / 2);
+        Vector2 viewAngle6 = DirectionFromAngle(transform.eulerAngles.z, farPeripheralFOV / 2);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * distance, Color.magenta);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * distance, Color.magenta);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle3 * distance, Color.cyan);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle4 * distance, Color.cyan);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle5 * distance, Color.blue);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle6 * distance, Color.blue);
 
-        //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
-        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
-        for (int i = 0; i < allHits.Length; i++)
+        float angleToTarget = Vector2.Angle(transform.right, directionToTarget);
+
+        if (angleToTarget <= farPeripheralFOV / 2)
         {
-            if (allHits[i].collider.tag == "Solid")
+            RaycastHit2D[] allHits = Physics2D.RaycastAll(transform.position, directionToTarget, distance, layerMask);
+
+            //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
+            Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
+            for (int i = 0; i < allHits.Length; i++)
             {
-                Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
-                Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
-                break;
-            }
-            if (allHits[i].collider.tag == "Player")
-            {
-                Debug.DrawLine(transform.position, allHits[i].point, Color.green);
-                return true;
-            }
-        } 
-        return false;            
+                if (allHits[i].collider.tag == "Solid")
+                {
+                    Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
+                    Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
+                    break;
+                }
+                if (allHits[i].collider.tag == "Player")
+                {
+                    Debug.DrawLine(transform.position, allHits[i].point, Color.green);
+                    if (angleToTarget <= centralFOV / 2)
+                    {
+                        return VisionState.CentralFOV;
+                    }
+                    if (angleToTarget <= midPeripheralFOV / 2)
+                    {
+                        return VisionState.MidPeripheralFOV;
+                    }
+                    if (angleToTarget <= farPeripheralFOV / 2)
+                    {
+                        return VisionState.FarPeripheralFOV;
+                    }
+                }
+            } 
+        }
+
+        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.black);
+        return VisionState.NotVisible;  
     }
 
     private void RotateTowardsMovement()
@@ -326,13 +404,23 @@ public class BetterEnemy : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 10 * Time.deltaTime);
     }
 
-    private void RotateTowardsTarget(Vector2 target)
+    private void RotateTowardsTarget(Vector3 target, float rotationSpeed)
     {
-        Vector2 directionToTarget = (target - (Vector2)transform.position).normalized;
-        float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;       
+        //Vector2 directionToTarget = (target - (Vector2)transform.position).normalized;
+        //float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;       
         //transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
-        //transform.rotation = Quaternion.Slerp(transform.rotation, angle, 0.2f);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 5 * Time.deltaTime);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), rotationSpeed * Time.deltaTime);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), rotationSpeed * Time.deltaTime);
+        
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), rotationSpeed * Time.deltaTime);
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(player.transform.eulerAngles.y, player.transform.eulerAngles.x, 0), 40 * rotationSpeed * Time.deltaTime);
+
+        //Quaternion rotation = Quaternion.LookRotation(directionToTarget);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.2f);
+
+        float angle = Mathf.Atan2(target.y - transform.position.y, target.x - transform.position.x ) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void Attack()
