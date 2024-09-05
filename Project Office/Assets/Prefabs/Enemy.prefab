@@ -142,7 +142,7 @@ MonoBehaviour:
   - {x: -0.056366116, y: -0.43619597, z: 0}
   m_ShapePathHash: 1005603365
   m_Mesh: {fileID: 0}
-  m_InstanceId: 179562
+  m_InstanceId: 424064
   m_LocalBounds:
     m_Center: {x: -0.22457296, y: 0.022553742, z: 0}
     m_Extent: {x: 0.58225405, y: 0.53323877, z: 0}
@@ -191,8 +191,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.19, y: 0}
-  m_Size: {x: 0.7, y: 1.5}
+  m_Offset: {x: -0.15, y: -0.03}
+  m_Size: {x: 0.7, y: 1.35}
   m_Direction: 0
 --- !u!1 &3089915087344741814
 GameObject:
@@ -335,7 +335,8 @@ MonoBehaviour:
   winText: {fileID: 0}
   hud: {fileID: 0}
   health: 100
-  speed: 5
+  walkingSpeed: 2
+  runningSpeed: 5
   instantDetectionDistance: 2.2
   detectionDistance: 20
   visionDistance: 30
@@ -353,7 +354,8 @@ MonoBehaviour:
   bulletSpread: 0.15
   shellForce: 10
   reloadTime: 2.5
-  cooldownTime: 1
+  minCooldownTime: 0.4
+  maxCooldownTime: 2
   magSize: 12
   movementAudioSource: {fileID: 3089915087477956686}
   walkingSFX: {fileID: 8300000, guid: 1200572a9c4e1144f8a5f78696cc81f7, type: 3}
@@ -371,7 +373,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3089915087477956688}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.75
+  m_Radius: 0.74
   m_Speed: 5
   m_Acceleration: 12
   avoidancePriority: 50

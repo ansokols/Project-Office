@@ -13,8 +13,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Text restartText;
     [SerializeField] private GameObject hud;
 
-    [Header("Characteristics")]
-    [SerializeField] private float speed;
+    [field: Header("Characteristics")]
+    [field: SerializeField] public float speed {get; private set;}
     [SerializeField] private float runningSpeed;
     [SerializeField] private int maxHealth;
     [SerializeField] private int health;

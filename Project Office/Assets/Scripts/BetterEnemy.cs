@@ -17,7 +17,8 @@ public class BetterEnemy : MonoBehaviour
 
     [Header("Enemy Characteristics")]
     [SerializeField] private int health;
-    [SerializeField] private float speed;
+    [SerializeField] private float walkingSpeed;
+    [SerializeField] private float runningSpeed;
     [SerializeField] private float instantDetectionDistance;
     [SerializeField] private float detectionDistance;
     [SerializeField] private float visionDistance;
@@ -43,7 +44,8 @@ public class BetterEnemy : MonoBehaviour
     [SerializeField] private float bulletSpread;
     [SerializeField] private float shellForce;
     [SerializeField] private float reloadTime;
-    [SerializeField] private float cooldownTime;
+    [SerializeField] private float minCooldownTime;
+    [SerializeField] private float maxCooldownTime;
     private float cooldown;
     [SerializeField] private int magSize;
     private int magOccupancy;
@@ -66,7 +68,6 @@ public class BetterEnemy : MonoBehaviour
     private int layerMask;
   
     private static int enemyAmount;
-    private int walkingMode;
 
     private float pathUpdateDelay;
     private float pathUpdateDeadline;
@@ -92,6 +93,14 @@ public class BetterEnemy : MonoBehaviour
         MidPeripheralFOV,
         FarPeripheralFOV
     }
+
+    private enum WalkingMode
+    {
+        Stop,
+        Walk,
+        Run
+    }
+    private WalkingMode currentWalkingMode;
 
     // Start is called before the first frame update
     void Start()
@@ -125,176 +134,143 @@ public class BetterEnemy : MonoBehaviour
     {
         if (player != null)
         {
-            Vector2 directionToPlayer = (player.position - transform.position).normalized;
-
             switch (currentEnemyState)
             {
                 default:
                 case EnemyState.Idle:
-                    if (Vector2.Distance(transform.position, player.position) <= instantDetectionDistance)
-                    {
-                        currentTarget = player.position;
-                        UpdateEnemyPath(currentTarget);
-                        currentEnemyState = EnemyState.Battle;
-                        break;
-                    }
+                    //currentTarget = new Vector3(12.1001f, 1.3247f, 10f);
+                    //UpdateEnemyPath(currentTarget);
+                    //Debug.Log("        " + agent.destination + " | " + currentTarget);
+                    SeekPlayer();
+                    break;
 
-                    if (Vector2.Distance(transform.position, player.position) <= detectionDistance)
+                case EnemyState.Search:
+                    if(agent.remainingDistance <= agent.stoppingDistance) //done with path
                     {
-                        Debug.Log(detectionLevel);
-                        float detectionTimeDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
-                        VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
-                        switch (currentVisionState)
+                        ToggleWalkingMode(WalkingMode.Stop);
+                        Vector3 point;
+                        if (RandomPoint(currentTarget, instantDetectionDistance, out point)) //pass in our centre point and radius of area
                         {
-                            default:
-                            case VisionState.NotVisible:
-                                if (detectionLevel >= detectionTimeDeadline)
-                                {
-                                    RotateTowardsTarget(currentTarget, 50f);
-                                }
-                                else if (detectionLevel > 0)
-                                {
-                                    detectionLevel -= (midPFOVdetectionTime + farPFOVdetectionTime) / 2 * Time.deltaTime;
-                                }
+                            Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f); //so you can see with gizmos
+                            UpdateEnemyPath(point);
+                        }
+                        while (true)
+                        {
+                            if (RotateTowardsTarget(point, 75f))
+                            {
                                 break;
-
-                            case VisionState.CentralFOV:
-                                currentTarget = player.position;
-                                UpdateEnemyPath(currentTarget);
-                                currentEnemyState = EnemyState.Battle;
-                                break;
-
-                            case VisionState.MidPeripheralFOV:
-                                if (detectionLevel >= detectionTimeDeadline)
-                                {
-                                    currentTarget = player.position;
-                                    RotateTowardsTarget(currentTarget, 50f);
-                                }
-                                else
-                                {
-                                    detectionLevel += detectionTimeDeadline / midPFOVdetectionTime * Time.deltaTime;
-                                }
-                                break;
-
-                            case VisionState.FarPeripheralFOV:
-                                if (detectionLevel >= detectionTimeDeadline)
-                                {
-                                    currentTarget = player.position;
-                                    RotateTowardsTarget(currentTarget, 50f);
-                                }
-                                else
-                                {
-                                    detectionLevel += detectionTimeDeadline / farPFOVdetectionTime * Time.deltaTime;
-                                }
-                                break;
+                            }
                         }
                     }
+                    else
+                    {
+                        ToggleWalkingMode(WalkingMode.Walk);
+                        RotateTowardsMovement(200f);
+                    }
+                    SeekPlayer();
                     break;
 
                 case EnemyState.Battle:
-                    agent.speed = speed;
+                    //UpdateEnemyPath(currentTarget);
 
-                    if(agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.1 && agent.destination == currentTarget)
+                    float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+                    Vector2 directionToPlayer = (player.position - transform.position).normalized;
+                    /*
+                    if(agent.pathStatus == NavMeshPathStatus.PathComplete)
                     {
-                        movementAudioSource.Stop();
-                        walkingMode = 0;
-                        currentEnemyState = EnemyState.Idle;
-
-                        bodyAnim.SetBool("isRunning", false);
-                        legsAnim.SetInteger("walkingMode", 0);
+                        Debug.Log("PathComplete");
                     }
-                    else if (Vector2.Distance(transform.position, player.position) > stoppingDistance)
+                    if(agent.remainingDistance < 0.1)
                     {
-                        if (walkingMode != 2)
-                        {
-                            movementAudioSource.Stop();
-                            walkingMode = 2;
-                            movementAudioSource.clip = runningSFX;
-                            movementAudioSource.volume = 0.25f;
-                            movementAudioSource.Play();
-
-                            bodyAnim.SetBool("isRunning", true);
-                            legsAnim.SetInteger("walkingMode", 2);
-                        }
+                        Debug.Log("remainingDistance < 0.1");
+                    }
+                    if((Vector2)agent.destination == (Vector2)currentTarget)
+                    {
+                        Debug.Log("destination == currentTarget");
+                    }
+                    else
+                    {
+                        Debug.Log("        " + agent.destination + " | " + currentTarget);
+                    }
+                    */
+                    if(agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.1 && (Vector2)agent.destination == (Vector2)currentTarget)
+                    {
+                        ToggleWalkingMode(WalkingMode.Stop);
+                        currentEnemyState = EnemyState.Search;
+                        Debug.Log("Stop");
+                    }
+                    else if (distanceToPlayer > stoppingDistance)
+                    {
+                        ToggleWalkingMode(WalkingMode.Run);
 
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
                             currentTarget = player.position;
-                            UpdateEnemyPath(currentTarget);
-                            RotateTowardsTarget(currentTarget, 150f);
+                            //UpdateEnemyPath(currentTarget);
+                            RotateTowardsTarget(currentTarget, 200f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
                         else
                         {
-                            RotateTowardsMovement();
+                            RotateTowardsMovement(200f);
                             if (Time.time <= extraDetectionTimeDeadline)
                             {
                                 currentTarget = player.position;
-                                UpdateEnemyPath(currentTarget);
+                                //UpdateEnemyPath(currentTarget);
                             }
                         }
+                        UpdateEnemyPath(currentTarget);
                     }
-                    else if (Vector2.Distance(transform.position, player.position) < retreatDistance)
+                    else if (distanceToPlayer < retreatDistance)
                     {
-                        if (walkingMode != 1)
-                        {
-                            movementAudioSource.Stop();
-                            walkingMode = 1;
-                            movementAudioSource.clip = walkingSFX;
-                            movementAudioSource.volume = 0.125f;
-                            movementAudioSource.Play();
-
-                            bodyAnim.SetBool("isRunning", true);
-                            legsAnim.SetInteger("walkingMode", 1);
-                        }
+                        ToggleWalkingMode(WalkingMode.Run);
                         
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
                             currentTarget = player.position;
                             Vector2 target = (Vector2)transform.position - directionToPlayer * stoppingDistance;
                             UpdateEnemyPath(target);
-                            RotateTowardsTarget(currentTarget, 150f);
+                            RotateTowardsTarget(currentTarget, 200f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
                         else
                         {
-                            UpdateEnemyPath(currentTarget);
-                            RotateTowardsMovement();
+                            RotateTowardsMovement(200f);
+
                             if (Time.time <= extraDetectionTimeDeadline)
                             {
                                 currentTarget = player.position;
-                                UpdateEnemyPath(currentTarget);
+                                //UpdateEnemyPath(currentTarget);
                             }
+
+                            UpdateEnemyPath(currentTarget);
                         }
                     }
                     else
                     {
-                        movementAudioSource.Stop();
-                        walkingMode = 0;
-
-                        bodyAnim.SetBool("isRunning", false);
-                        legsAnim.SetInteger("walkingMode", 0);
-
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != VisionState.NotVisible)
                         {
-                            agent.speed = 0;
+                            ToggleWalkingMode(WalkingMode.Stop);
                             currentTarget = player.position;
-                            UpdateEnemyPath(currentTarget);
-                            RotateTowardsTarget(currentTarget, 150f);
+                            //UpdateEnemyPath(currentTarget);
+                            RotateTowardsTarget(currentTarget, 200f);
                             Attack();
                             extraDetectionTimeDeadline = extraDetectionTime + Time.time;
                         }
                         else
                         { 
-                            RotateTowardsMovement();
+                            ToggleWalkingMode(WalkingMode.Run);
+                            RotateTowardsMovement(200f);
+
                             if (Time.time <= extraDetectionTimeDeadline)
                             {
                                 currentTarget = player.position;
-                                UpdateEnemyPath(currentTarget);
+                                //UpdateEnemyPath(currentTarget);
                             }
                         }
+                        UpdateEnemyPath(currentTarget);
                     }
                     break;
             }
@@ -335,12 +311,143 @@ public class BetterEnemy : MonoBehaviour
         health -= damage;
     }
 
+    private void ToggleWalkingMode(WalkingMode targetWalkingMode)
+    {
+        if (currentWalkingMode != targetWalkingMode)
+        {
+            currentWalkingMode = targetWalkingMode;
+            switch (targetWalkingMode)
+            {
+                default:
+                case WalkingMode.Stop:
+                    agent.speed = 0;
+                    
+                    movementAudioSource.Stop();
+
+                    bodyAnim.SetBool("isRunning", false);
+                    legsAnim.SetInteger("walkingMode", 0);
+                    break;
+
+                case WalkingMode.Walk:
+                    agent.speed = walkingSpeed;
+
+                    movementAudioSource.Stop();
+                    movementAudioSource.clip = walkingSFX;
+                    movementAudioSource.volume = 0.125f;
+                    movementAudioSource.Play();
+
+                    bodyAnim.SetBool("isRunning", true);
+                    legsAnim.SetInteger("walkingMode", 1);
+                    break;
+
+                case WalkingMode.Run:
+                    agent.speed = runningSpeed;
+
+                    movementAudioSource.Stop();
+                    movementAudioSource.clip = runningSFX;
+                    movementAudioSource.volume = 0.25f;
+                    movementAudioSource.Play();
+
+                    bodyAnim.SetBool("isRunning", true);
+                    legsAnim.SetInteger("walkingMode", 2);
+                    break;
+            }
+        }
+    }
+
+    private void SeekPlayer()
+    {
+        if (Vector2.Distance(transform.position, player.position) <= instantDetectionDistance)
+        {
+            currentTarget = player.position;
+            UpdateEnemyPath(currentTarget);
+            currentEnemyState = EnemyState.Battle;
+        }
+
+        else if (Vector2.Distance(transform.position, player.position) <= detectionDistance)
+        {
+            float detectionTimeDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
+            Vector2 directionToPlayer = (player.position - transform.position).normalized;
+
+            VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
+            switch (currentVisionState)
+            {
+                default:
+                case VisionState.NotVisible:
+                    if (detectionLevel >= detectionTimeDeadline)
+                    {
+                        if (RotateTowardsTarget(currentTarget, 50f))
+                        {
+                            currentEnemyState = EnemyState.Search;
+                        }
+                    }
+                    else if (detectionLevel > 0)
+                    {
+                        detectionLevel -= (midPFOVdetectionTime + farPFOVdetectionTime) / 2 * Time.deltaTime;
+                    }
+                    break;
+
+                case VisionState.CentralFOV:
+                    currentTarget = player.position;
+                    UpdateEnemyPath(currentTarget);
+                    currentEnemyState = EnemyState.Battle;
+                    break;
+
+                case VisionState.MidPeripheralFOV:
+                    if (detectionLevel >= detectionTimeDeadline)
+                    {
+                        currentTarget = player.position;
+                        if (RotateTowardsTarget(currentTarget, 50f))
+                        {
+                            currentEnemyState = EnemyState.Search;
+                        }
+                    }
+                    else
+                    {
+                        detectionLevel += detectionTimeDeadline / midPFOVdetectionTime * Time.deltaTime;
+                    }
+                    break;
+
+                case VisionState.FarPeripheralFOV:
+                    if (detectionLevel >= detectionTimeDeadline)
+                    {
+                        currentTarget = player.position;
+                        if (RotateTowardsTarget(currentTarget, 50f))
+                        {
+                            currentEnemyState = EnemyState.Search;
+                        }
+                    }
+                    else
+                    {
+                        detectionLevel += detectionTimeDeadline / farPFOVdetectionTime * Time.deltaTime;
+                    }
+                    break;
+            }
+        }
+    }
+
     private void UpdateEnemyPath(Vector3 target)
     {
         if (Time.time >= pathUpdateDeadline) {
             pathUpdateDeadline = Time.time + pathUpdateDelay;
             agent.SetDestination(target);
         }
+    }
+
+    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    {
+        Vector3 randomPoint = center + Random.insideUnitSphere * range; //random point in a sphere 
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas)) //documentation: https://docs.unity3d.com/ScriptReference/AI.NavMesh.SamplePosition.html
+        { 
+            //the 1.0f is the max distance from the random point to a point on the navmesh, might want to increase if range is big
+            //or add a for loop like in the documentation
+            result = hit.position;
+            return true;
+        }
+
+        result = Vector3.zero;
+        return false;
     }
 
     private VisionState getCurrentVisionState(Vector2 directionToTarget, float distance)
@@ -398,13 +505,25 @@ public class BetterEnemy : MonoBehaviour
         return VisionState.NotVisible;  
     }
 
-    private void RotateTowardsMovement()
+    private bool RotateTowardsMovement(float rotationSpeed)
     {
+
         float angle = Mathf.Atan2(agent.velocity.y, agent.velocity.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 10 * Time.deltaTime);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 10 * Time.deltaTime);
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        return transform.rotation == targetRotation;
+
+
+        /*
+        Vector3 direction = (agent.steeringTarget - transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(new Vector3(0, 0, direction.z));
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        return transform.rotation == targetRotation;
+        */
     }
 
-    private void RotateTowardsTarget(Vector3 target, float rotationSpeed)
+    private bool RotateTowardsTarget(Vector3 target, float rotationSpeed)
     {
         //Vector2 directionToTarget = (target - (Vector2)transform.position).normalized;
         //float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;       
@@ -421,6 +540,8 @@ public class BetterEnemy : MonoBehaviour
         float angle = Mathf.Atan2(target.y - transform.position.y, target.x - transform.position.x ) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+        return transform.rotation == targetRotation;
     }
 
     private void Attack()
@@ -429,7 +550,7 @@ public class BetterEnemy : MonoBehaviour
         {
             if (magOccupancy != 0)
             {
-                Shoot();
+                //Shoot();
             }
             else
             {
@@ -462,7 +583,7 @@ public class BetterEnemy : MonoBehaviour
         GameObject effect = Instantiate(flashEffect, firePoint.position, firePoint.rotation);
         Destroy(effect, 0.05f);
 
-        cooldown = cooldownTime;
+        cooldown = Random.Range(minCooldownTime, maxCooldownTime);
         magOccupancy -= 1;
     }
 
