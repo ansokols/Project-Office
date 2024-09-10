@@ -142,7 +142,7 @@ MonoBehaviour:
   - {x: -0.056366116, y: -0.43619597, z: 0}
   m_ShapePathHash: 1005603365
   m_Mesh: {fileID: 0}
-  m_InstanceId: 424064
+  m_InstanceId: 165856
   m_LocalBounds:
     m_Center: {x: -0.22457296, y: 0.022553742, z: 0}
     m_Extent: {x: 0.58225405, y: 0.53323877, z: 0}
@@ -191,40 +191,9 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.15, y: -0.03}
-  m_Size: {x: 0.7, y: 1.35}
+  m_Offset: {x: -0.1, y: 0}
+  m_Size: {x: 0.7, y: 1.2}
   m_Direction: 0
---- !u!1 &3089915087344741814
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3089915087344741813}
-  m_Layer: 8
-  m_Name: Raycast
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3089915087344741813
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3089915087344741814}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3089915087477956683}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3089915087477956688
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,6 +204,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3089915087477956683}
   - component: {fileID: 3089915087477956682}
+  - component: {fileID: 8753149495274217405}
   - component: {fileID: 8363256125991653446}
   - component: {fileID: 1458378375723788551}
   - component: {fileID: 3089915087477956693}
@@ -264,7 +234,6 @@ Transform:
   - {fileID: 3089915087271957073}
   - {fileID: 3089915087048544361}
   - {fileID: 3089915088935297783}
-  - {fileID: 3089915087344741813}
   - {fileID: 8168860927952513244}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -315,6 +284,36 @@ MonoBehaviour:
   reloadSFX: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
   shellsSFX: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
   rotationSpeed: 1000
+--- !u!114 &8753149495274217405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3089915087477956688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844f2fdb8a7fb404c86db6a3f3a64c50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ammoBoxPrefab>k__BackingField: {fileID: 5035258833829736881, guid: ed5d3078b8b55314fa1324cc3741b7ef, type: 3}
+  <healBoxPrefab>k__BackingField: {fileID: 247782636309783506, guid: 37133d3cdfe0a97469cc01c73fb8a847, type: 3}
+  <restartButton>k__BackingField: {fileID: 0}
+  <restartText>k__BackingField: {fileID: 0}
+  <winText>k__BackingField: {fileID: 0}
+  <hud>k__BackingField: {fileID: 0}
+  <player>k__BackingField: {fileID: 0}
+  <firePoint>k__BackingField: {fileID: 3089915088935297783}
+  <bulletPrefab>k__BackingField: {fileID: 767460807071786867, guid: 917b20d5fafa77e4b9298c24325a753a, type: 3}
+  <shellPrefab>k__BackingField: {fileID: 9145559371113436495, guid: 029b263de288d8e4c8f72da0400c014c, type: 3}
+  <flashEffect>k__BackingField: {fileID: 700682518664992690, guid: bd61bbb92256679438ebbfa250076c21, type: 3}
+  <movementAudioSource>k__BackingField: {fileID: 3089915087477956686}
+  <walkingSFX>k__BackingField: {fileID: 8300000, guid: 1200572a9c4e1144f8a5f78696cc81f7, type: 3}
+  <runningSFX>k__BackingField: {fileID: 8300000, guid: 3fa573a8816a5804682d3f536982da33, type: 3}
+  <playerAudioSource>k__BackingField: {fileID: 3089915087477956687}
+  <shotSFX>k__BackingField: {fileID: 8300000, guid: 591836c792c42f345bbe32f3419b298b, type: 3}
+  <reloadSFX>k__BackingField: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
+  <shellsSFX>k__BackingField: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
 --- !u!114 &8363256125991653446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,13 +326,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523508b669848dc4ea1e20320766c638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ammoBoxPrefab: {fileID: 5035258833829736881, guid: ed5d3078b8b55314fa1324cc3741b7ef, type: 3}
-  healBoxPrefab: {fileID: 247782636309783506, guid: 37133d3cdfe0a97469cc01c73fb8a847, type: 3}
-  player: {fileID: 0}
-  restartButton: {fileID: 0}
-  restartText: {fileID: 0}
-  winText: {fileID: 0}
-  hud: {fileID: 0}
   health: 100
   walkingSpeed: 2
   runningSpeed: 5
@@ -346,10 +338,6 @@ MonoBehaviour:
   midPeripheralFOV: 120
   farPeripheralFOV: 210
   healDropChance: 0.25
-  firePoint: {fileID: 3089915088935297783}
-  bulletPrefab: {fileID: 767460807071786867, guid: 917b20d5fafa77e4b9298c24325a753a, type: 3}
-  shellPrefab: {fileID: 9145559371113436495, guid: 029b263de288d8e4c8f72da0400c014c, type: 3}
-  flashEffect: {fileID: 700682518664992690, guid: bd61bbb92256679438ebbfa250076c21, type: 3}
   bulletForce: 100
   bulletSpread: 0.15
   shellForce: 10
@@ -357,13 +345,6 @@ MonoBehaviour:
   minCooldownTime: 0.4
   maxCooldownTime: 2
   magSize: 12
-  movementAudioSource: {fileID: 3089915087477956686}
-  walkingSFX: {fileID: 8300000, guid: 1200572a9c4e1144f8a5f78696cc81f7, type: 3}
-  runningSFX: {fileID: 8300000, guid: 3fa573a8816a5804682d3f536982da33, type: 3}
-  playerAudioSource: {fileID: 3089915087477956687}
-  shotSFX: {fileID: 8300000, guid: 591836c792c42f345bbe32f3419b298b, type: 3}
-  reloadSFX: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
-  shellsSFX: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
 --- !u!195 &1458378375723788551
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -373,7 +354,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3089915087477956688}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.74
+  m_Radius: 0.625
   m_Speed: 5
   m_Acceleration: 12
   avoidancePriority: 50
@@ -385,7 +366,7 @@ NavMeshAgent:
   m_Height: 1.45
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 1
 --- !u!50 &3089915087477956693
 Rigidbody2D:
   serializedVersion: 4
@@ -845,7 +826,7 @@ Transform:
   - {fileID: 1741828102961229734}
   - {fileID: 593441032007067824}
   m_Father: {fileID: 3089915087477956683}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7654744142831809326
 GameObject:

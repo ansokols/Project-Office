@@ -71,14 +71,14 @@ public class Player : MonoBehaviour
 
         if (moveInput.x == 0 && moveInput.y == 0)
         {
-            anim.SetInteger("walkingMode", 0);
+            anim.SetInteger("movementMode", 0);
             moveVelocity = moveInput.normalized * speed;
             movementAudioSource.Stop();
             walkingMode = 0;
         }
         else if (Input.GetKey(KeyCode.LeftShift))
         {
-            anim.SetInteger("walkingMode", 2);
+            anim.SetInteger("movementMode", 2);
             moveVelocity = moveInput.normalized * runningSpeed;
             if (walkingMode != 2)
             {
@@ -91,7 +91,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            anim.SetInteger("walkingMode", 1);
+            anim.SetInteger("movementMode", 1);
             moveVelocity = moveInput.normalized * speed;
             if (walkingMode != 1)
             {
