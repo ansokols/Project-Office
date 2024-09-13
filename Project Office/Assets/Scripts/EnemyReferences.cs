@@ -14,6 +14,9 @@ public class EnemyReferences : MonoBehaviour
     [field: SerializeField] public Text winText {get; private set;}
     [field: SerializeField] public GameObject hud {get; private set;}
     [field: SerializeField] public Transform player {get; private set;}
+    [field: SerializeField] public Transform[] waypoints {get; private set;}
+    [field: SerializeField] public List<Transform> locations {get; private set;}
+    //[field: SerializeField] public Transform[] locations {get; private set;}
 
     [field: Header("Shooting Objects")]
     [field: SerializeField] public Transform firePoint {get; private set;}

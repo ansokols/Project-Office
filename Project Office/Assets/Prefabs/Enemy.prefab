@@ -142,7 +142,7 @@ MonoBehaviour:
   - {x: -0.056366116, y: -0.43619597, z: 0}
   m_ShapePathHash: 1005603365
   m_Mesh: {fileID: 0}
-  m_InstanceId: 165856
+  m_InstanceId: 67066
   m_LocalBounds:
     m_Center: {x: -0.22457296, y: 0.022553742, z: 0}
     m_Extent: {x: 0.58225405, y: 0.53323877, z: 0}
@@ -303,6 +303,8 @@ MonoBehaviour:
   <winText>k__BackingField: {fileID: 0}
   <hud>k__BackingField: {fileID: 0}
   <player>k__BackingField: {fileID: 0}
+  <waypoints>k__BackingField: []
+  <locations>k__BackingField: []
   <firePoint>k__BackingField: {fileID: 3089915088935297783}
   <bulletPrefab>k__BackingField: {fileID: 767460807071786867, guid: 917b20d5fafa77e4b9298c24325a753a, type: 3}
   <shellPrefab>k__BackingField: {fileID: 9145559371113436495, guid: 029b263de288d8e4c8f72da0400c014c, type: 3}
@@ -326,6 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523508b669848dc4ea1e20320766c638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleMode: 0
   health: 100
   walkingSpeed: 2
   runningSpeed: 5
@@ -334,6 +337,10 @@ MonoBehaviour:
   visionDistance: 30
   stoppingDistance: 6
   retreatDistance: 4
+  quickSearchRadius: 6
+  deepSearchRadius: 25
+  quickSearchTime: 25
+  deepSearchTime: 50
   centralFOV: 60
   midPeripheralFOV: 120
   farPeripheralFOV: 210
