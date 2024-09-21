@@ -87,7 +87,7 @@ public class BetterEnemy : MonoBehaviour
         enemyReferences.agent.updateRotation = false;
         enemyReferences.agent.updateUpAxis = false;
         pathUpdateDelay = 0.2f;
-        extraDetectionTime = 0.25f;
+        extraDetectionTime = 0.5f;
         enemiesLayer = 8;
         layerMask = ~(1 << enemiesLayer);
 
@@ -122,6 +122,7 @@ public class BetterEnemy : MonoBehaviour
                     {
                         default:
                         case Enums.IdleMode.Passive:
+                            enemyReferences.vision.SetActive(false);
                             /*
                             Debug.LogWarning(gameObject.name + " seems to be stuck");
                                 Debug.LogWarning("	navTarget:" + enemyReferences.waypoints[waypointIndex] + "::" + enemyReferences.waypoints[waypointIndex].position);
@@ -164,6 +165,7 @@ public class BetterEnemy : MonoBehaviour
                             break;
                         
                         case Enums.IdleMode.ConsistentPatrol:
+                            enemyReferences.vision.SetActive(true);
                             if (enemyReferences.waypoints != null && enemyReferences.waypoints.Length != 0)
                             {
                                 if ((Vector2)enemyReferences.agent.transform.position == (Vector2)enemyReferences.waypoints[waypointIndex].position) //done with path
@@ -181,6 +183,7 @@ public class BetterEnemy : MonoBehaviour
                             break;
                         
                         case Enums.IdleMode.RandomPatrol:
+                            enemyReferences.vision.SetActive(true);
                             if (enemyReferences.waypoints != null && enemyReferences.waypoints.Length != 0)
                             {
                                 if ((Vector2)enemyReferences.agent.transform.position == (Vector2)enemyReferences.waypoints[waypointIndex].position) //done with path
@@ -200,6 +203,8 @@ public class BetterEnemy : MonoBehaviour
                     break;
 
                 case Enums.EnemyState.QuickSearch:
+                    enemyReferences.vision.SetActive(true);
+
                     if (timeSearched >= quickSearchTime)
                     {
                         timeSearched = 0f;
@@ -249,6 +254,8 @@ public class BetterEnemy : MonoBehaviour
                     break;
 
                 case Enums.EnemyState.DeepSearch:
+                    enemyReferences.vision.SetActive(true);
+
                     if (relevantLocations == null)
                     {
                         relevantLocations = enemyReferences.locations.Where(location => Vector2.Distance(transform.position, location.position) <= deepSearchRadius).ToList();
@@ -324,6 +331,7 @@ public class BetterEnemy : MonoBehaviour
 
                 case Enums.EnemyState.Battle:
                     //UpdateEnemyPath(currentTarget);
+                    enemyReferences.vision.SetActive(true);
 
                     float distanceToPlayer = Vector2.Distance(transform.position, enemyReferences.player.position);
                     Vector2 directionToPlayer = (enemyReferences.player.position - transform.position).normalized;
@@ -683,13 +691,13 @@ public class BetterEnemy : MonoBehaviour
             RaycastHit2D[] allHits = Physics2D.RaycastAll(transform.position, directionToTarget, distance, layerMask);
 
             //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
-            Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
+            //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
             for (int i = 0; i < allHits.Length; i++)
             {
                 if (allHits[i].collider.tag == "Solid")
                 {
-                    Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
-                    Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
+                    //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
+                    //Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
                     break;
                 }
                 if (allHits[i].collider.tag == "Player")
@@ -711,7 +719,7 @@ public class BetterEnemy : MonoBehaviour
             } 
         }
 
-        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.black);
+        //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.black);
         return Enums.VisionState.NotVisible;  
     }
 

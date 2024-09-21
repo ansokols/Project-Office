@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class EnemyReferences : MonoBehaviour
 {
     [field: Header("Enemy Objects")]
+    [field: SerializeField] public GameObject vision {get; private set;}
     [field: SerializeField] public GameObject ammoBoxPrefab {get; private set;}
     [field: SerializeField] public GameObject healBoxPrefab {get; private set;}
     [field: SerializeField] public Image restartButton {get; private set;}
