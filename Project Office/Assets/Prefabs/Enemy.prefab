@@ -204,8 +204,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3089915087477956683}
   - component: {fileID: 3089915087477956682}
-  - component: {fileID: 8753149495274217405}
   - component: {fileID: 8363256125991653446}
+  - component: {fileID: 8753149495274217405}
+  - component: {fileID: 3817580202337417059}
   - component: {fileID: 1458378375723788551}
   - component: {fileID: 3089915087477956693}
   - component: {fileID: 3089915087477956694}
@@ -284,6 +285,42 @@ MonoBehaviour:
   reloadSFX: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
   shellsSFX: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
   rotationSpeed: 1000
+--- !u!114 &8363256125991653446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3089915087477956688}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 523508b669848dc4ea1e20320766c638, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleMode: 0
+  health: 100
+  walkingSpeed: 2
+  runningSpeed: 5
+  instantDetectionDistance: 2.2
+  detectionDistance: 20
+  visionDistance: 30
+  stoppingDistance: 6
+  retreatDistance: 4
+  quickSearchRadius: 6
+  deepSearchRadius: 25
+  quickSearchTime: 25
+  deepSearchTime: 50
+  centralFOV: 60
+  midPeripheralFOV: 120
+  farPeripheralFOV: 210
+  healDropChance: 0.25
+  bulletForce: 100
+  bulletSpread: 0.15
+  shellForce: 10
+  reloadTime: 2.5
+  minCooldownTime: 0.4
+  maxCooldownTime: 2
+  magSize: 12
 --- !u!114 &8753149495274217405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,7 +354,7 @@ MonoBehaviour:
   <shotSFX>k__BackingField: {fileID: 8300000, guid: 591836c792c42f345bbe32f3419b298b, type: 3}
   <reloadSFX>k__BackingField: {fileID: 8300000, guid: 95e46c940186ead41b285940c88d0626, type: 3}
   <shellsSFX>k__BackingField: {fileID: 8300000, guid: 9a68e48817fa7284fb0185a8ae41f465, type: 3}
---- !u!114 &8363256125991653446
+--- !u!114 &3817580202337417059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -326,33 +363,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 3089915087477956688}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 523508b669848dc4ea1e20320766c638, type: 3}
+  m_Script: {fileID: 11500000, guid: 347d206d720598948a8c8d38187a27b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idleMode: 0
-  health: 100
-  walkingSpeed: 2
-  runningSpeed: 5
-  instantDetectionDistance: 2.2
-  detectionDistance: 20
-  visionDistance: 30
-  stoppingDistance: 6
-  retreatDistance: 4
-  quickSearchRadius: 6
-  deepSearchRadius: 25
-  quickSearchTime: 25
-  deepSearchTime: 50
-  centralFOV: 60
-  midPeripheralFOV: 120
-  farPeripheralFOV: 210
-  healDropChance: 0.25
-  bulletForce: 100
-  bulletSpread: 0.15
-  shellForce: 10
-  reloadTime: 2.5
-  minCooldownTime: 0.4
-  maxCooldownTime: 2
-  magSize: 12
+  <idleMode>k__BackingField: 0
+  <health>k__BackingField: 100
+  <walkingSpeed>k__BackingField: 2
+  <runningSpeed>k__BackingField: 5
+  <instantDetectionDistance>k__BackingField: 2.2
+  <detectionDistance>k__BackingField: 20
+  <visionDistance>k__BackingField: 30
+  <stoppingDistance>k__BackingField: 6
+  <retreatDistance>k__BackingField: 4
+  <quickSearchRadius>k__BackingField: 6
+  <deepSearchRadius>k__BackingField: 25
+  <quickSearchTime>k__BackingField: 25
+  <deepSearchTime>k__BackingField: 50
+  <centralFOV>k__BackingField: 60
+  <midPeripheralFOV>k__BackingField: 120
+  <farPeripheralFOV>k__BackingField: 210
+  <healDropChance>k__BackingField: 0.25
+  <bulletForce>k__BackingField: 100
+  <bulletSpread>k__BackingField: 0.15
+  <shellForce>k__BackingField: 10
+  <reloadTime>k__BackingField: 2.5
+  <minCooldownTime>k__BackingField: 0.4
+  <maxCooldownTime>k__BackingField: 2
+  <magSize>k__BackingField: 12
 --- !u!195 &1458378375723788551
 NavMeshAgent:
   m_ObjectHideFlags: 0

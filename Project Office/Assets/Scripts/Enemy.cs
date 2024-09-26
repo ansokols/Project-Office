@@ -1,293 +1,389 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Linq;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("Enemy Objects")]
-    public GameObject ammoBoxPrefab;
-    public GameObject healBoxPrefab;
-    public Transform player;
-    public Image restartButton;
-    public Text restartText;
-    public Text winText;
-    public GameObject hud;
+    [field: Header("Enemy Characteristics")]
+    [field: SerializeField] public Enums.IdleMode idleMode {get; private set;}
+    [field: SerializeField] public int health {get; set;}
+    [field: SerializeField] public float walkingSpeed {get; private set;}
+    [field: SerializeField] public float runningSpeed {get; private set;}
+    [field: SerializeField] public float instantDetectionDistance {get; private set;}
+    [field: SerializeField] public float detectionDistance {get; private set;}
+    [field: SerializeField] public float visionDistance {get; private set;}
+    [field: SerializeField] public float stoppingDistance {get; private set;}
+    [field: SerializeField] public float retreatDistance {get; private set;}
+    [field: SerializeField] public float quickSearchRadius {get; private set;}
+    [field: SerializeField] public float deepSearchRadius {get; private set;}
+    [field: SerializeField] public float quickSearchTime {get; private set;}
+    [field: SerializeField] public float deepSearchTime {get; private set;}
+    [field: Range(0,360)]
+    [field: SerializeField] public float centralFOV {get; private set;}
+    [field: Range(0,360)]
+    [field: SerializeField] public float midPeripheralFOV {get; private set;}
+    [field: Range(0,360)]
+    [field: SerializeField] public float farPeripheralFOV {get; private set;}
+    [field: Range(0, 1)]
+    [field: SerializeField] public float healDropChance {get; private set;}
 
-    [Header("Enemy Characteristics")]
-    public int health;
-    public float speed;
-    public float visionDistance;
-    public float stoppingDistance;
-    public float retreatDistance;
-    [Range(0,360)]
-    public float centralFOV;
-    [Range(0,360)]
-    public float peripheralFOV;
-    [Range(0, 1)]
-    public float healDropChance;
+    [field: Header("Shooting Characteristics")]
+    [field: SerializeField] public float bulletForce {get; private set;}
+    [field: SerializeField] public float bulletSpread {get; private set;}
+    [field: SerializeField] public float shellForce {get; private set;}
+    [field: SerializeField] public float reloadTime {get; private set;}
+    [field: SerializeField] public float minCooldownTime {get; private set;}
+    [field: SerializeField] public float maxCooldownTime {get; private set;}
+    [field: SerializeField] public int magSize {get; private set;}
 
-    [Header("Shooting Objects")]
-    public Transform firePoint;
-    public GameObject bulletPrefab;
-    public GameObject shellPrefab;
-    public GameObject flashEffect;
+    public EnemyReferences enemyReferences {get; private set;}
 
-    [Header("Shooting Characteristics")]
-    public float bulletForce;
-    public float bulletSpread;
-    public float shellForce;
-    public float reloadTime;
-    public float cooldownTime;
-    [HideInInspector] public float cooldown;
-    public int magSize;
-    private int magOccupancy;
+    public static int enemyAmount {get; private set;}
 
-    [Header("Audio")]
-    public AudioSource movementAudioSource;
-    public AudioClip walkingSFX;
-    public AudioClip runningSFX;
-    public AudioSource playerAudioSource;
-    public AudioClip shotSFX;
-    public AudioClip reloadSFX;
-    public AudioClip shellsSFX;
+    public Vector3 currentTarget {get; set;}
+    public Vector3 home {get; private set;}
+    public int enemiesLayer {get; set;}
+    public int layerMask {get; set;}
 
-    [field: SerializeField, Header("Raycast")] private float rotationSpeed;
-    //private Transform raycast;
-    private RaycastHit2D[] allHits;
+    public float pathUpdateDelay {get; set;}
+    public float pathUpdateDeadline {get; set;}
+    public float midPFOVdetectionTime {get; set;}
+    public float farPFOVdetectionTime {get; set;}
+    public float movementPauseDeadline {get; set;}
 
-    private Animator feetAnim;
-    private Animator bodyAnim;
-    private Vector2 moveVector;
-    private int walkingMode;
-    private bool isPlayerDetected;
-    private static int enemyAmount;
+    public float detectionLevel {get; set;}
+
+    public Enums.MovementMode currentMovementMode {get; set;}
+
+
+    public EnemyStateMachine enemyStateMachine {get; set;}
+    public EnemyIdleState enemyIdleState {get; set;}
+    public EnemyBattleState enemyBattleState {get; set;}
+    public EnemyQuickSearchState enemyQuickSearchState {get; set;}
+    public EnemyDeepSearchState enemyDeepSearchState {get; set;}
+
+    private void Awake()
+    {
+        enemyReferences = GetComponent<EnemyReferences>();
+
+        enemyStateMachine = new EnemyStateMachine();
+        enemyIdleState = new EnemyIdleState(enemyStateMachine, this, enemyReferences);
+        enemyBattleState = new EnemyBattleState(enemyStateMachine, this, enemyReferences);
+        enemyQuickSearchState = new EnemyQuickSearchState(enemyStateMachine, this, enemyReferences);
+        enemyDeepSearchState = new EnemyDeepSearchState(enemyStateMachine, this, enemyReferences);
+    }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        feetAnim = GetComponent<Animator>();
-        bodyAnim = transform.Find("Body").gameObject.GetComponent<Animator>();
-        //raycast = transform.Find("Raycast").gameObject.GetComponent<Transform>();
-        magOccupancy = Random.Range(0, magSize + 1);
+        enemyReferences.agent.updateRotation = false;
+        enemyReferences.agent.updateUpAxis = false;
+        pathUpdateDelay = 0.2f;
+        enemiesLayer = 8;
+        layerMask = ~(1 << enemiesLayer);
+
+        home = transform.position;
+        detectionLevel = 0f;
+        midPFOVdetectionTime = 4f;
+        farPFOVdetectionTime = 7f;
 
         enemyAmount = 14;
-        restartButton.enabled = false;
-        restartText.enabled = false;
-        winText.enabled = false;
+        enemyReferences.restartButton.enabled = false;
+        enemyReferences.restartText.enabled = false;
+        enemyReferences.winText.enabled = false;
+        enemyReferences.hud.SetActive(true);
+
+        enemyStateMachine.Initialize(enemyIdleState);
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (player != null)
+        enemyStateMachine.Update();
+
+        if (health <= 0)
         {
-            if (!isPlayerDetected)
+            Instantiate(enemyReferences.ammoBoxPrefab, transform.position + new Vector3(-0.75f, 0, 0), transform.rotation * Quaternion.Euler(0, 0, 60));
+
+            if(Random.Range(0f, 1f) <= healDropChance)
             {
-                if (Vector2.Distance(transform.position, player.position) <= visionDistance)
-                {
-                    //raycast.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
-                    //allHits = Physics2D.RaycastAll(raycast.position, raycast.right, visionDistance);
-
-                    Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -peripheralFOV / 2);
-                    Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, peripheralFOV / 2);
-                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * visionDistance, Color.blue);
-                    Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * visionDistance, Color.blue);
-
-                    Vector2 directionToPlayer = (player.position - transform.position).normalized;
-                    float angleToPlayer = Vector2.Angle(transform.right, directionToPlayer);
-
-                    if (angleToPlayer <= peripheralFOV / 2)
-                    {
-                        int enemiesLayer = 8;
-                        int layerMask = 1 << enemiesLayer;
-                        layerMask = ~layerMask;
-                        allHits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionDistance, layerMask);
-
-                        //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.yellow);
-                        for (int i = 0; i < allHits.Length; i++)
-                        {
-                            if (allHits[i].collider.tag == "Solid")
-                            {
-                                Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.red);
-                                Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
-                                break;
-                            }
-                            else if (allHits[i].collider.tag == "Player")
-                            {
-                                Debug.DrawLine(transform.position, allHits[i].point, Color.green);
-                                isPlayerDetected = true;
-                                break;
-                            }
-                        }             
-                    }
-                    else
-                    {
-                        Debug.DrawLine(transform.position, (Vector2)transform.position + directionToPlayer * visionDistance, Color.black);
-                    }
-                }
-            }
-            else
-            {
-                if (Vector2.Distance(transform.position, player.position) > visionDistance)
-                {
-                    movementAudioSource.Stop();
-                    walkingMode = 0;
-                    isPlayerDetected = false;
-
-                    bodyAnim.SetBool("isRunning", false);
-                    feetAnim.SetInteger("walkingMode", 0);
-                }
-                else if (Vector2.Distance(transform.position, player.position) > stoppingDistance)
-                {
-                    if (walkingMode != 2)
-                    {
-                        movementAudioSource.Stop();
-                        walkingMode = 2;
-                        movementAudioSource.clip = runningSFX;
-                        movementAudioSource.volume = 0.25f;
-                        movementAudioSource.Play();
-
-                        bodyAnim.SetBool("isRunning", true);
-                        feetAnim.SetInteger("walkingMode", 2);
-                    }
-
-                    moveVector = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
-                    RotateTowardsTarget();
-                    //Attack();
-                }
-                else if (Vector2.Distance(transform.position, player.position) < retreatDistance)
-                {
-                    if (walkingMode != 1)
-                    {
-                        movementAudioSource.Stop();
-                        walkingMode = 1;
-                        movementAudioSource.clip = walkingSFX;
-                        movementAudioSource.volume = 0.125f;
-                        movementAudioSource.Play();
-
-                        bodyAnim.SetBool("isRunning", true);
-                        feetAnim.SetInteger("walkingMode", 1);
-                    }
-
-                    moveVector = Vector2.MoveTowards(transform.position, player.position, -speed/2 * Time.deltaTime);
-                    RotateTowardsTarget();
-                    //Attack();
-                }
-                else
-                {
-                    movementAudioSource.Stop();
-                    walkingMode = 0;
-
-                    bodyAnim.SetBool("isRunning", false);
-                    feetAnim.SetInteger("walkingMode", 0);
-
-                    RotateTowardsTarget();
-                    //Attack();
-                }
+                Instantiate(enemyReferences.healBoxPrefab, transform.position + new Vector3(0.75f, 0, 0), transform.rotation * Quaternion.Euler(0, 0, 120));
             }
 
-            if (health <= 0)
+            enemyAmount -= 1;
+            if (enemyAmount <= 0)
             {
-                Instantiate(ammoBoxPrefab, transform.position + new Vector3(-0.75f, 0, 0), transform.rotation * Quaternion.Euler(0, 0, 60));
-
-                if(Random.Range(0f, 1f) <= healDropChance)
-                {
-                    Instantiate(healBoxPrefab, transform.position + new Vector3(0.75f, 0, 0), transform.rotation * Quaternion.Euler(0, 0, 120));
-                }
-
-                enemyAmount -= 1;
-                if (enemyAmount <= 0)
-                {
-                    restartButton.enabled = true;
-                    restartText.enabled = true;
-                    winText.enabled = true;
-                    hud.SetActive(false);
-                }
-                Destroy(gameObject);
+                enemyReferences.restartButton.gameObject.SetActive(true);
+                enemyReferences.restartButton.enabled = true;
+                enemyReferences.restartText.enabled = true;
+                enemyReferences.winText.enabled = true;
             }
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (walkingMode != 0)
-        {
-            transform.position = moveVector;
+            Destroy(gameObject);
         }
     }
 
     public void TakeDamage(int damage)
     {
         health -= damage;
+        //TODO
+        currentTarget = enemyReferences.player.position;
+        UpdateEnemyPath(currentTarget);
+        enemyStateMachine.ChangeState(enemyBattleState);
     }
 
-    private void RotateTowardsTarget()
+    public void ToggleMovementMode(Enums.MovementMode targetMovementMode)
     {
-        Vector2 directionToPlayer = (player.position - transform.position).normalized;
-        float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;       
-        transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
-    }
-
-    private void Attack()
-    {
-        if (cooldown <= 0)
+        if (currentMovementMode != targetMovementMode)
         {
-            if (magOccupancy != 0)
+            currentMovementMode = targetMovementMode;
+            switch (targetMovementMode)
             {
-                Shoot();
+                default:
+                case Enums.MovementMode.Stop:
+                    enemyReferences.agent.speed = 0;
+                    
+                    enemyReferences.movementAudioSource.Stop();
+
+                    enemyReferences.bodyAnim.SetBool("isRunning", false);
+                    enemyReferences.legsAnim.SetInteger("movementMode", 0);
+                    break;
+
+                case Enums.MovementMode.Walk:
+                    enemyReferences.agent.speed = walkingSpeed;
+
+                    enemyReferences.movementAudioSource.Stop();
+                    enemyReferences.movementAudioSource.clip = enemyReferences.walkingSFX;
+                    enemyReferences.movementAudioSource.volume = 0.125f;
+                    enemyReferences.movementAudioSource.Play();
+
+                    enemyReferences.bodyAnim.SetBool("isRunning", true);
+                    enemyReferences.legsAnim.SetInteger("movementMode", 1);
+                    break;
+
+                case Enums.MovementMode.Run:
+                    enemyReferences.agent.speed = runningSpeed;
+
+                    enemyReferences.movementAudioSource.Stop();
+                    enemyReferences.movementAudioSource.clip = enemyReferences.runningSFX;
+                    enemyReferences.movementAudioSource.volume = 0.25f;
+                    enemyReferences.movementAudioSource.Play();
+
+                    enemyReferences.bodyAnim.SetBool("isRunning", true);
+                    enemyReferences.legsAnim.SetInteger("movementMode", 2);
+                    break;
             }
-            else
+        }
+    }
+
+    public /*DetectionState*/bool SeekPlayer()
+    {
+        float detectionDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
+        
+        if (Vector2.Distance(transform.position, enemyReferences.player.position) <= instantDetectionDistance)
+        {
+            currentTarget = enemyReferences.player.position;
+            UpdateEnemyPath(currentTarget);
+            enemyStateMachine.ChangeState(enemyBattleState);
+            detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
+            Debug.Log("SeekPlayer :" + detectionLevel);
+            //Reset();
+            //return DetectionState.Found;
+            return true;
+        }
+
+        if (Vector2.Distance(transform.position, enemyReferences.player.position) <= detectionDistance)
+        {      
+            Vector2 directionToPlayer = (enemyReferences.player.position - transform.position).normalized;
+            Enums.VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
+
+            switch (currentVisionState)
             {
-                StartCoroutine(Reload());
+                default:
+                case Enums.VisionState.NotVisible:
+                    if (detectionLevel > 0 && detectionLevel < detectionDeadline)
+                    {
+                        detectionLevel -= detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
+                        Debug.Log("SeekPlayer1 :" + detectionLevel);
+                    }
+                    break;
+
+                case Enums.VisionState.CentralFOV:
+                    currentTarget = enemyReferences.player.position;
+                    UpdateEnemyPath(currentTarget);
+                    enemyStateMachine.ChangeState(enemyBattleState);
+                    detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
+                    Debug.Log("SeekPlayer :" + detectionLevel);
+                    //Reset();
+                    //return DetectionState.Found;
+                    return true;
+                    break;
+
+                case Enums.VisionState.MidPeripheralFOV:
+                    if (detectionLevel >= detectionDeadline)
+                    {
+                        currentTarget = enemyReferences.player.position;
+                    }
+                    else
+                    {
+                        detectionLevel += detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
+                        Debug.Log("SeekPlayer2 :" + detectionLevel);
+                    }
+                    break;
+
+                case Enums.VisionState.FarPeripheralFOV:
+                    if (detectionLevel >= detectionDeadline)
+                    {
+                        currentTarget = enemyReferences.player.position;
+                    }
+                    else
+                    {
+                        detectionLevel += detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
+                        Debug.Log("SeekPlayer3 :" + detectionLevel);
+                    }
+                    break;
             }
         }
         else
         {
-            cooldown -= Time.deltaTime;
+            if (detectionLevel > 0 && detectionLevel < detectionDeadline)
+            {
+                detectionLevel -= detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
+                //Debug.Log("SeekPlayer4 :" + detectionLevel);
+            }
+        }
+
+        if (detectionLevel >= detectionDeadline)
+        {
+            ToggleMovementMode(Enums.MovementMode.Stop);
+
+            if (RotateTowardsTarget(currentTarget, 50f))
+            {
+                UpdateEnemyPath(currentTarget);
+                ToggleMovementMode(Enums.MovementMode.Walk);
+                enemyStateMachine.ChangeState(enemyQuickSearchState);
+                detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
+                //Debug.Log("SeekPlayer :" + detectionLevel);
+            }
+            
+            //return DetectionState.Detected;
+            return true;
+        }
+        
+        //return DetectionState.NotDetected;
+        return false;
+    }
+
+    public void UpdateEnemyPath(Vector3 target)
+    {
+        if (/*Time.time >= pathUpdateDeadline && */enemyReferences.agent.destination != target)
+        {
+            pathUpdateDeadline = Time.time + pathUpdateDelay;
+            enemyReferences.agent.SetDestination(target);
         }
     }
 
-    private void Shoot()
+    public Enums.VisionState getCurrentVisionState(Vector2 directionToTarget, float distance)
     {
-        playerAudioSource.PlayOneShot(shotSFX, 0.3f);
-        StartCoroutine(PlaySoundWithDelay(shellsSFX, 0.5f, 0.25f));
-        bodyAnim.Play("Pistol.Shoot", 0, 0f);
+        Vector2 viewAngle1 = DirectionFromAngle(transform.eulerAngles.z, -centralFOV / 2);
+        Vector2 viewAngle2 = DirectionFromAngle(transform.eulerAngles.z, centralFOV / 2);
+        Vector2 viewAngle3 = DirectionFromAngle(transform.eulerAngles.z, -midPeripheralFOV / 2);
+        Vector2 viewAngle4 = DirectionFromAngle(transform.eulerAngles.z, midPeripheralFOV / 2);
+        Vector2 viewAngle5 = DirectionFromAngle(transform.eulerAngles.z, -farPeripheralFOV / 2);
+        Vector2 viewAngle6 = DirectionFromAngle(transform.eulerAngles.z, farPeripheralFOV / 2);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle1 * distance, Color.magenta);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle2 * distance, Color.magenta);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle3 * distance, Color.cyan);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle4 * distance, Color.cyan);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle5 * distance, Color.blue);
+        Debug.DrawLine(transform.position, (Vector2)transform.position + viewAngle6 * distance, Color.blue);
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        Vector3 dir = firePoint.right + new Vector3(Random.Range(-bulletSpread, bulletSpread), Random.Range(-bulletSpread, bulletSpread), .0f);
-        rb.AddForce(dir * bulletForce, ForceMode2D.Impulse);
+        float angleToTarget = Vector2.Angle(transform.right, directionToTarget);
 
-        GameObject shell = Instantiate(shellPrefab, firePoint.position, firePoint.rotation);
-        Rigidbody2D rb2 = shell.GetComponent<Rigidbody2D>();
-        rb2.AddForce(-firePoint.up * shellForce, ForceMode2D.Impulse);
-        Destroy(shell, 20f);
+        if (angleToTarget <= farPeripheralFOV / 2)
+        {
+            RaycastHit2D[] allHits = Physics2D.RaycastAll(transform.position, directionToTarget, distance, layerMask);
 
+            //TODO чёрная / жёлтая / красная линия короче, чем нужно если Z != 10
+            //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.yellow);
+            for (int i = 0; i < allHits.Length; i++)
+            {
+                if (allHits[i].collider.tag == "Solid")
+                {
+                    //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.red);
+                    //Debug.DrawLine(transform.position, allHits[i].point, Color.yellow);
+                    break;
+                }
+                if (allHits[i].collider.tag == "Player")
+                {
+                    Debug.DrawLine(transform.position, allHits[i].point, Color.green);
+                    if (angleToTarget <= centralFOV / 2)
+                    {
+                        return Enums.VisionState.CentralFOV;
+                    }
+                    if (angleToTarget <= midPeripheralFOV / 2)
+                    {
+                        return Enums.VisionState.MidPeripheralFOV;
+                    }
+                    if (angleToTarget <= farPeripheralFOV / 2)
+                    {
+                        return Enums.VisionState.FarPeripheralFOV;
+                    }
+                }
+            } 
+        }
 
-        GameObject effect = Instantiate(flashEffect, firePoint.position, firePoint.rotation);
-        Destroy(effect, 0.05f);
-
-        cooldown = cooldownTime;
-        magOccupancy -= 1;
+        //Debug.DrawLine(transform.position, (Vector2)transform.position + directionToTarget * distance, Color.black);
+        return Enums.VisionState.NotVisible;  
     }
 
-    private IEnumerator Reload()
+    public bool RotateTowardsMovement(float rotationSpeed)
     {
-        playerAudioSource.PlayOneShot(reloadSFX, 0.5f);
-        bodyAnim.Play("Pistol.Reload", 0, 0f);
 
-        cooldown = reloadTime;
-        yield return new WaitForSeconds(reloadTime);
+        float angle = Mathf.Atan2(enemyReferences.agent.velocity.y, enemyReferences.agent.velocity.x) * Mathf.Rad2Deg;
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), 10 * Time.deltaTime);
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
-        magOccupancy = magSize;
+        if (transform.rotation != targetRotation)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            //return transform.rotation == targetRotation;
+            //Debug.Log("*rotation*");
+            return false;
+        }
+        else
+        {
+            //Debug.Log("Already rotated");
+            return true;
+        }
+
+        /*
+        Vector3 direction = (enemyReferences.agent.steeringTarget - transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(new Vector3(0, 0, direction.z));
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        return transform.rotation == targetRotation;
+        */
     }
 
-    private IEnumerator PlaySoundWithDelay(AudioClip clip, float volume, float delay)
+    public bool RotateTowardsTarget(Vector3 target, float rotationSpeed)
     {
-        yield return new WaitForSeconds(delay);
-        playerAudioSource.PlayOneShot(clip, volume);
+        //Vector2 directionToTarget = (target - (Vector2)transform.position).normalized;
+        //float angle = Mathf.Atan2(directionToTarget.y, directionToTarget.x) * Mathf.Rad2Deg;       
+        //transform.rotation = Quaternion.Euler(Vector3.forward * (angle));
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), rotationSpeed * Time.deltaTime);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), rotationSpeed * Time.deltaTime);
+        
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.forward * (angle)), rotationSpeed * Time.deltaTime);
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(enemyReferences.player.transform.eulerAngles.y, enemyReferences.player.transform.eulerAngles.x, 0), 40 * rotationSpeed * Time.deltaTime);
+
+        //Quaternion rotation = Quaternion.LookRotation(directionToTarget);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.2f);
+
+        float angle = Mathf.Atan2(target.y - transform.position.y, target.x - transform.position.x ) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+        return transform.rotation == targetRotation;
     }
 
     private Vector2 DirectionFromAngle(float eulerY, float angleInDegrees)

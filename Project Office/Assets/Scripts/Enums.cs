@@ -4,7 +4,6 @@ public class Enums
     public enum EnemyState
     {
         Idle,
-        Patrol,
         Battle,
         QuickSearch,
         DeepSearch
