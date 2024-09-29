@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
 
     [field: Header("Characteristics")]
     [field: SerializeField] public float speed {get; private set;}
-    [SerializeField] private float runningSpeed;
+    [field: SerializeField] public float runningSpeed {get; private set;}
     [SerializeField] private int maxHealth;
     [SerializeField] private int health;
     [SerializeField] private int healCapacity;

@@ -28,6 +28,7 @@ public class Shooting : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource playerAudioSource;
     [SerializeField] private AudioSource interactionAudioSource;
+    [field: SerializeField] public AudioSource shootingAudioSource {get; private set;}
     [SerializeField] private AudioClip shotSFX;
     [SerializeField] private AudioClip drySFX;
     [SerializeField] private AudioClip reloadSFX;
@@ -56,7 +57,7 @@ public class Shooting : MonoBehaviour
                     }
                     else
                     {
-                        playerAudioSource.PlayOneShot(drySFX, 0.4f);
+                        playerAudioSource.PlayOneShot(drySFX, 0.3f);
                     }
                 }
 
@@ -87,7 +88,7 @@ public class Shooting : MonoBehaviour
 
     private void Shoot()
     {
-        playerAudioSource.PlayOneShot(shotSFX, 0.3f);
+        shootingAudioSource.PlayOneShot(shotSFX, 0.3f);
         StartCoroutine(PlaySoundWithDelay(shellsSFX, 0.5f, 0.25f));
         anim.Play("Pistol.Shoot", 0, 0f);
 
@@ -110,7 +111,7 @@ public class Shooting : MonoBehaviour
 
     private IEnumerator Reload()
     {
-        playerAudioSource.PlayOneShot(reloadSFX, 0.5f);
+        playerAudioSource.PlayOneShot(reloadSFX, 0.4f);
         anim.Play("Pistol.Reload", 0, 0f);
 
         cooldown = reloadTime;

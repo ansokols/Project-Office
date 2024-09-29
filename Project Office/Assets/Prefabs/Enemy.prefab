@@ -373,8 +373,10 @@ MonoBehaviour:
   <instantDetectionDistance>k__BackingField: 2.2
   <detectionDistance>k__BackingField: 20
   <visionDistance>k__BackingField: 30
-  <stoppingDistance>k__BackingField: 6
-  <retreatDistance>k__BackingField: 4
+  <stepsHearingDistance>k__BackingField: 15
+  <shotsHearingDistance>k__BackingField: 25
+  <stoppingDistance>k__BackingField: 15
+  <retreatDistance>k__BackingField: 5
   <quickSearchRadius>k__BackingField: 6
   <deepSearchRadius>k__BackingField: 25
   <quickSearchTime>k__BackingField: 25

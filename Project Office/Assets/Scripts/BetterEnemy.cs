@@ -333,8 +333,9 @@ public class BetterEnemy : MonoBehaviour
                     //UpdateEnemyPath(currentTarget);
                     enemyReferences.vision.SetActive(true);
 
-                    float distanceToPlayer = Vector2.Distance(transform.position, enemyReferences.player.position);
-                    Vector2 directionToPlayer = (enemyReferences.player.position - transform.position).normalized;
+                    Vector3 playerPosition = enemyReferences.player.transform.position;
+                    float distanceToPlayer = Vector2.Distance(transform.position, playerPosition);
+                    Vector2 directionToPlayer = (playerPosition - transform.position).normalized;
                     
                     /*
                     if(enemyReferences.agent.pathStatus == NavMeshPathStatus.PathComplete)
@@ -380,7 +381,7 @@ public class BetterEnemy : MonoBehaviour
 
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != Enums.VisionState.NotVisible)
                         {
-                            currentTarget = enemyReferences.player.position;
+                            currentTarget = playerPosition;
                             //UpdateEnemyPath(currentTarget);
                             RotateTowardsTarget(currentTarget, 200f);
                             Attack();
@@ -391,7 +392,7 @@ public class BetterEnemy : MonoBehaviour
                             RotateTowardsMovement(200f);
                             if (Time.time <= extraDetectionDeadline)
                             {
-                                currentTarget = enemyReferences.player.position;
+                                currentTarget = playerPosition;
                                 //UpdateEnemyPath(currentTarget);
                             }
                         }
@@ -403,7 +404,7 @@ public class BetterEnemy : MonoBehaviour
                         
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != Enums.VisionState.NotVisible)
                         {
-                            currentTarget = enemyReferences.player.position;
+                            currentTarget = playerPosition;
                             Vector2 target = (Vector2)transform.position - directionToPlayer * stoppingDistance;
                             UpdateEnemyPath(target);
                             RotateTowardsTarget(currentTarget, 200f);
@@ -416,7 +417,7 @@ public class BetterEnemy : MonoBehaviour
 
                             if (Time.time <= extraDetectionDeadline)
                             {
-                                currentTarget = enemyReferences.player.position;
+                                currentTarget = playerPosition;
                                 //UpdateEnemyPath(currentTarget);
                             }
 
@@ -428,7 +429,7 @@ public class BetterEnemy : MonoBehaviour
                         if (getCurrentVisionState(directionToPlayer, visionDistance) != Enums.VisionState.NotVisible)
                         {
                             ToggleMovementMode(Enums.MovementMode.Stop);
-                            currentTarget = enemyReferences.player.position;
+                            currentTarget = playerPosition;
                             //UpdateEnemyPath(currentTarget);
                             RotateTowardsTarget(currentTarget, 200f);
                             Attack();
@@ -441,7 +442,7 @@ public class BetterEnemy : MonoBehaviour
 
                             if (Time.time <= extraDetectionDeadline)
                             {
-                                currentTarget = enemyReferences.player.position;
+                                currentTarget = playerPosition;
                                 //UpdateEnemyPath(currentTarget);
                             }
                         }
@@ -476,7 +477,7 @@ public class BetterEnemy : MonoBehaviour
     {
         health -= damage;
         //TODO
-        currentTarget = enemyReferences.player.position;
+        currentTarget = enemyReferences.player.transform.position;
         UpdateEnemyPath(currentTarget);
         Debug.Log("TakeDamage --> Battle");
         currentEnemyState = Enums.EnemyState.Battle;
@@ -544,11 +545,12 @@ public class BetterEnemy : MonoBehaviour
 
     private /*DetectionState*/bool SeekPlayer()
     {
+        Vector3 playerPosition = enemyReferences.player.transform.position;
         float detectionDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
         
-        if (Vector2.Distance(transform.position, enemyReferences.player.position) <= instantDetectionDistance)
+        if (Vector2.Distance(transform.position, playerPosition) <= instantDetectionDistance)
         {
-            currentTarget = enemyReferences.player.position;
+            currentTarget = playerPosition;
             UpdateEnemyPath(currentTarget);
             Debug.Log("SeekPlayer(1): " + currentEnemyState + " --> Battle");
             currentEnemyState = Enums.EnemyState.Battle;
@@ -559,9 +561,9 @@ public class BetterEnemy : MonoBehaviour
             return true;
         }
 
-        if (Vector2.Distance(transform.position, enemyReferences.player.position) <= detectionDistance)
+        if (Vector2.Distance(transform.position, playerPosition) <= detectionDistance)
         {      
-            Vector2 directionToPlayer = (enemyReferences.player.position - transform.position).normalized;
+            Vector2 directionToPlayer = (playerPosition - transform.position).normalized;
             Enums.VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
 
             switch (currentVisionState)
@@ -576,7 +578,7 @@ public class BetterEnemy : MonoBehaviour
                     break;
 
                 case Enums.VisionState.CentralFOV:
-                    currentTarget = enemyReferences.player.position;
+                    currentTarget = playerPosition;
                     UpdateEnemyPath(currentTarget);
                     Debug.Log("SeekPlayer(3): " + currentEnemyState + " --> Battle");
                     currentEnemyState = Enums.EnemyState.Battle;
@@ -590,7 +592,7 @@ public class BetterEnemy : MonoBehaviour
                 case Enums.VisionState.MidPeripheralFOV:
                     if (detectionLevel >= detectionDeadline)
                     {
-                        currentTarget = enemyReferences.player.position;
+                        currentTarget = playerPosition;
                     }
                     else
                     {
@@ -602,7 +604,7 @@ public class BetterEnemy : MonoBehaviour
                 case Enums.VisionState.FarPeripheralFOV:
                     if (detectionLevel >= detectionDeadline)
                     {
-                        currentTarget = enemyReferences.player.position;
+                        currentTarget = playerPosition;
                     }
                     else
                     {

@@ -8,14 +8,12 @@ public class EnemyDeepSearchState : EnemyState
     private List<Transform> relevantLocations;
     public int relevantLocationIndex;
     private float timeSearched;
-    private bool isRotated;
 
     public EnemyDeepSearchState(EnemyStateMachine enemyStateMachine, Enemy enemy, EnemyReferences enemyReferences) : base(enemyStateMachine, enemy, enemyReferences)
     {
         relevantLocations = null;
         relevantLocationIndex = 0;
         timeSearched = 0f;
-        isRotated = false;
     }
 
     public override void Enter()
@@ -23,6 +21,7 @@ public class EnemyDeepSearchState : EnemyState
         Debug.Log("DeepSearch state [ENTER]");
 
         enemy.ToggleMovementMode(Enums.MovementMode.Stop);
+        enemyReferences.agent.ResetPath();
         enemyReferences.vision.SetActive(true);
 
         timeSearched = 0f;
@@ -53,14 +52,13 @@ public class EnemyDeepSearchState : EnemyState
             return;
         }
 
-        if (enemyReferences.agent.remainingDistance <= enemyReferences.agent.stoppingDistance) //done with path
+        if (enemyReferences.agent.remainingDistance <= enemyReferences.agent.stoppingDistance + 1) //done with path
         {
             if (relevantLocations.Count != 0)
             {
                 enemy.UpdateEnemyPath(relevantLocations[relevantLocationIndex].position);
                 enemy.ToggleMovementMode(Enums.MovementMode.Stop);
-                enemy.enemyReferences.agent.speed = 0.01f;
-                isRotated = false;
+                enemyReferences.agent.speed = 0.01f;
                 IncreaseLocationIndex();
             }
         }
@@ -68,19 +66,8 @@ public class EnemyDeepSearchState : EnemyState
         {
             if (!enemy.SeekPlayer())
             {
-                if (isRotated)
-                {
-                    //Debug.Log("if 2 start");
-                    enemy.ToggleMovementMode(Enums.MovementMode.Walk);
-                    enemy.RotateTowardsMovement(150f);
-                    //Debug.Log("if 2 end");
-                }
-                else if (enemy.RotateTowardsMovement(100f))
-                {
-                    //Debug.Log("if 3 start");
-                    isRotated = true;
-                    //Debug.Log("if 3 end");
-                }
+                enemy.ToggleMovementMode(Enums.MovementMode.Walk);
+                enemy.RotateTowardsMovement(200f);
             }
         }
 

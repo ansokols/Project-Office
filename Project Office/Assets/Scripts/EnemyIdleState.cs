@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class EnemyIdleState : EnemyState
 {
+    private Vector3 home;
     private int waypointIndex;
 
     public EnemyIdleState(EnemyStateMachine enemyStateMachine, Enemy enemy, EnemyReferences enemyReferences) : base(enemyStateMachine, enemy, enemyReferences)
     {
+        home = enemy.transform.position;
         waypointIndex = 0;
     }
 
@@ -30,7 +32,7 @@ public class EnemyIdleState : EnemyState
         {
             default:
             case Enums.IdleMode.Passive:
-                enemy.UpdateEnemyPath(enemy.home);
+                enemy.UpdateEnemyPath(home);
 
                 if (enemyReferences.agent.remainingDistance <= enemyReferences.agent.stoppingDistance) //done with path
                 {

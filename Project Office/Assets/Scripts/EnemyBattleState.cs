@@ -6,7 +6,7 @@ public class EnemyBattleState : EnemyState
 {
     private float cooldown;
     private int magOccupancy;
-    public float extraDetectionTime;
+    private float extraDetectionTime;
     private float extraDetectionDeadline;
 
     public EnemyBattleState(EnemyStateMachine enemyStateMachine, Enemy enemy, EnemyReferences enemyReferences) : base(enemyStateMachine, enemy, enemyReferences)
@@ -14,7 +14,6 @@ public class EnemyBattleState : EnemyState
         cooldown = 0;
         magOccupancy = enemy.magSize;
         extraDetectionTime = 0.5f;
-        //magOccupancy = Random.Range(0, enemy.magSize + 1);
     }
 
     public override void Enter()
@@ -31,14 +30,15 @@ public class EnemyBattleState : EnemyState
 
     public override void Update()
     {
-        if(/*enemyReferences.agent.pathStatus == NavMeshPathStatus.PathComplete && */enemyReferences.agent.remainingDistance <= enemyReferences.agent.stoppingDistance)
+        if(enemyReferences.agent.remainingDistance <= enemyReferences.agent.stoppingDistance + 1) //done with path
         {
             enemy.enemyStateMachine.ChangeState(enemy.enemyDeepSearchState);
             return;
         }
 
-        float distanceToPlayer = Vector2.Distance(enemy.transform.position, enemyReferences.player.position);
-        Vector2 directionToPlayer = (enemyReferences.player.position - enemy.transform.position).normalized;
+        Vector3 playerPosition = enemyReferences.player.transform.position;
+        float distanceToPlayer = Vector2.Distance(enemy.transform.position, playerPosition);
+        Vector2 directionToPlayer = (playerPosition - enemy.transform.position).normalized;
 
         if (distanceToPlayer > enemy.stoppingDistance)
         {
@@ -46,7 +46,7 @@ public class EnemyBattleState : EnemyState
 
             if (enemy.getCurrentVisionState(directionToPlayer, enemy.visionDistance) != Enums.VisionState.NotVisible)
             {
-                enemy.currentTarget = enemyReferences.player.position;
+                enemy.currentTarget = playerPosition;
                 enemy.RotateTowardsTarget(enemy.currentTarget, 200f);
                 Attack();
                 extraDetectionDeadline = extraDetectionTime + Time.time;
@@ -56,20 +56,19 @@ public class EnemyBattleState : EnemyState
                 enemy.RotateTowardsMovement(200f);
                 if (Time.time <= extraDetectionDeadline)
                 {
-                    enemy.currentTarget = enemyReferences.player.position;
+                    enemy.currentTarget = playerPosition;
                 }
             }
 
             enemy.UpdateEnemyPath(enemy.currentTarget);
         }
         else if (distanceToPlayer < enemy.retreatDistance)
-        {
-            enemy.ToggleMovementMode(Enums.MovementMode.Run);
-            
+        {     
             if (enemy.getCurrentVisionState(directionToPlayer, enemy.visionDistance) != Enums.VisionState.NotVisible)
             {
-                enemy.currentTarget = enemyReferences.player.position;
-                Vector2 target = (Vector2)enemy.transform.position - directionToPlayer * enemy.stoppingDistance;
+                enemy.ToggleMovementMode(Enums.MovementMode.Walk);
+                enemy.currentTarget = playerPosition;
+                Vector2 target = (Vector2)enemy.transform.position - directionToPlayer * enemy.retreatDistance;
                 enemy.UpdateEnemyPath(target);
                 enemy.RotateTowardsTarget(enemy.currentTarget, 200f);
                 Attack();
@@ -77,11 +76,12 @@ public class EnemyBattleState : EnemyState
             }
             else
             {
+                enemy.ToggleMovementMode(Enums.MovementMode.Run);
                 enemy.RotateTowardsMovement(200f);
 
                 if (Time.time <= extraDetectionDeadline)
                 {
-                    enemy.currentTarget = enemyReferences.player.position;
+                    enemy.currentTarget = playerPosition;
                 }
 
                 enemy.UpdateEnemyPath(enemy.currentTarget);
@@ -92,21 +92,22 @@ public class EnemyBattleState : EnemyState
             if (enemy.getCurrentVisionState(directionToPlayer, enemy.visionDistance) != Enums.VisionState.NotVisible)
             {
                 enemy.ToggleMovementMode(Enums.MovementMode.Stop);
-                enemy.currentTarget = enemyReferences.player.position;
+                enemy.currentTarget = playerPosition;
                 enemy.RotateTowardsTarget(enemy.currentTarget, 200f);
                 Attack();
                 extraDetectionDeadline = extraDetectionTime + Time.time;
             }
             else
-            { 
+            {
                 enemy.ToggleMovementMode(Enums.MovementMode.Run);
                 enemy.RotateTowardsMovement(200f);
 
                 if (Time.time <= extraDetectionDeadline)
                 {
-                    enemy.currentTarget = enemyReferences.player.position;
+                    enemy.currentTarget = playerPosition;
                 }
             }
+
             enemy.UpdateEnemyPath(enemy.currentTarget);
         }
     }
