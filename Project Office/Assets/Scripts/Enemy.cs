@@ -22,6 +22,8 @@ public class Enemy : MonoBehaviour
     [field: SerializeField] public float deepSearchRadius {get; private set;}
     [field: SerializeField] public float quickSearchTime {get; private set;}
     [field: SerializeField] public float deepSearchTime {get; private set;}
+    [field: SerializeField] public float midPFOVDetectionTime {get; private set;}
+    [field: SerializeField] public float farPFOVDetectionTime {get; private set;}
     [field: Range(0,360)]
     [field: SerializeField] public float centralFOV {get; private set;}
     [field: Range(0,360)]
@@ -46,8 +48,6 @@ public class Enemy : MonoBehaviour
 
     private float pathUpdateDelay;
     private float pathUpdateDeadline;
-    private float midPFOVdetectionTime;
-    private float farPFOVdetectionTime;
     private float detectionLevel;
     private Vector3 previousTarget;
 
@@ -88,8 +88,6 @@ public class Enemy : MonoBehaviour
         enemiesLayer = 8;
         layerMask = ~(1 << enemiesLayer);
         detectionLevel = 0f;
-        midPFOVdetectionTime = 4f;
-        farPFOVdetectionTime = 7f;
         enemyAmount = 15;
 
         enemyReferences.restartButton.enabled = false;
@@ -180,7 +178,8 @@ public class Enemy : MonoBehaviour
     public bool SeekPlayer()
     {
         Vector3 playerPosition = enemyReferences.player.transform.position;
-        float detectionDeadline = midPFOVdetectionTime * farPFOVdetectionTime;
+        float distanceToPlayer = Vector2.Distance(transform.position, playerPosition);
+        float detectionDeadline = midPFOVDetectionTime * farPFOVDetectionTime;
         var playerSpeed = enemyReferences.player.GetComponent<Rigidbody2D>().velocity.magnitude;
         var path = new UnityEngine.AI.NavMeshPath();
         enemyReferences.agent.CalculatePath(playerPosition, path);
@@ -193,17 +192,17 @@ public class Enemy : MonoBehaviour
             return true;
         }
         
-        if (Vector2.Distance(transform.position, playerPosition) <= instantDetectionDistance)
+        if (distanceToPlayer <= instantDetectionDistance)
         {
             currentTarget = playerPosition;
             UpdateEnemyPath(currentTarget);
             enemyStateMachine.ChangeState(enemyBattleState);
-            detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
-            Debug.Log("SeekPlayer :" + detectionLevel);
+            detectionLevel -= detectionDeadline / midPFOVDetectionTime * Time.deltaTime;
+            //Debug.Log("SeekPlayer :" + detectionLevel);
             return true;
         }
 
-        if (Vector2.Distance(transform.position, playerPosition) <= detectionDistance)
+        if (distanceToPlayer <= detectionDistance)
         {      
             Vector2 directionToPlayer = (playerPosition - transform.position).normalized;
             Enums.VisionState currentVisionState = getCurrentVisionState(directionToPlayer, detectionDistance);
@@ -214,8 +213,8 @@ public class Enemy : MonoBehaviour
                 case Enums.VisionState.NotVisible:
                     if (detectionLevel > 0 && detectionLevel < detectionDeadline)
                     {
-                        detectionLevel -= detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
-                        Debug.Log("SeekPlayer1 :" + detectionLevel);
+                        detectionLevel -= detectionDeadline / farPFOVDetectionTime * Time.deltaTime;
+                        //Debug.Log("SeekPlayer1 :" + detectionLevel);
                     }
                     break;
 
@@ -223,8 +222,8 @@ public class Enemy : MonoBehaviour
                     currentTarget = playerPosition;
                     UpdateEnemyPath(currentTarget);
                     enemyStateMachine.ChangeState(enemyBattleState);
-                    detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
-                    Debug.Log("SeekPlayer :" + detectionLevel);
+                    detectionLevel -= detectionDeadline / midPFOVDetectionTime * Time.deltaTime;
+                    //Debug.Log("SeekPlayer :" + detectionLevel);
                     return true;
                     break;
 
@@ -235,8 +234,8 @@ public class Enemy : MonoBehaviour
                     }
                     else
                     {
-                        detectionLevel += detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
-                        Debug.Log("SeekPlayer2 :" + detectionLevel);
+                        detectionLevel += (detectionDeadline / midPFOVDetectionTime) * ((detectionDistance - distanceToPlayer) / detectionDistance)  * Time.deltaTime;
+                        //Debug.Log("SeekPlayer2 :" + detectionLevel);
                     }
                     break;
 
@@ -247,8 +246,8 @@ public class Enemy : MonoBehaviour
                     }
                     else
                     {
-                        detectionLevel += detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
-                        Debug.Log("SeekPlayer3 :" + detectionLevel);
+                        detectionLevel += (detectionDeadline / farPFOVDetectionTime) * ((detectionDistance - distanceToPlayer) / detectionDistance) * Time.deltaTime;
+                        //Debug.Log("SeekPlayer3 :" + detectionLevel);
                     }
                     break;
             }
@@ -257,7 +256,7 @@ public class Enemy : MonoBehaviour
         {
             if (detectionLevel > 0 && detectionLevel < detectionDeadline)
             {
-                detectionLevel -= detectionDeadline / farPFOVdetectionTime * Time.deltaTime;
+                detectionLevel -= detectionDeadline / farPFOVDetectionTime * Time.deltaTime;
                 //Debug.Log("SeekPlayer4 :" + detectionLevel);
             }
         }
@@ -270,7 +269,7 @@ public class Enemy : MonoBehaviour
             {
                 UpdateEnemyPath(currentTarget);
                 enemyStateMachine.ChangeState(enemyQuickSearchState);
-                detectionLevel -= detectionDeadline / midPFOVdetectionTime * Time.deltaTime;
+                detectionLevel -= detectionDeadline / midPFOVDetectionTime * Time.deltaTime;
                 //Debug.Log("SeekPlayer :" + detectionLevel);
             }
             

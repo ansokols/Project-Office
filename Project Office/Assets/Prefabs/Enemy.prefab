@@ -381,6 +381,8 @@ MonoBehaviour:
   <deepSearchRadius>k__BackingField: 25
   <quickSearchTime>k__BackingField: 25
   <deepSearchTime>k__BackingField: 50
+  <midPFOVDetectionTime>k__BackingField: 2
+  <farPFOVDetectionTime>k__BackingField: 6
   <centralFOV>k__BackingField: 60
   <midPeripheralFOV>k__BackingField: 120
   <farPeripheralFOV>k__BackingField: 210
